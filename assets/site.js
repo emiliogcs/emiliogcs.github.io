@@ -609,3 +609,115 @@ if (copyEmail) {
     timer = setTimeout(() => (copyEmail.textContent = 'copy'), 1600);
   });
 }
+
+// -------------------------------------------------------------- code page
+// /code/: a copy button on every code block (the label says so for 1.6s and
+// screen readers hear it; without the clipboard, the code is selected).
+// Console examples copy as code: prompts and printed output are left out.
+
+for (const block of document.querySelectorAll('.doc .code:not(.sig)')) {
+  const pre = block.querySelector('pre');
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'act copy-code';
+  button.textContent = 'copy';
+  button.setAttribute('aria-label', `copy the ${block.dataset.lang}`);
+  block.querySelector('.code-head').append(button);
+
+  let timer;
+  button.addEventListener('click', async () => {
+    let text = pre.textContent;
+    if (/^>>> /m.test(text)) {
+      text = text.split('\n').filter((l) => /^(>>>|\.\.\.)( |$)/.test(l)).map((l) => l.slice(4)).join('\n');
+    }
+    try {
+      await navigator.clipboard.writeText(text.replace(/\n*$/, '\n'));
+    } catch {
+      const range = document.createRange();
+      range.selectNodeContents(pre);
+      getSelection().removeAllRanges();
+      getSelection().addRange(range);
+      return;
+    }
+    button.textContent = 'copied';
+    status.textContent = '';
+    status.textContent = 'Copied to the clipboard.';
+    clearTimeout(timer);
+    timer = setTimeout(() => (button.textContent = 'copy'), 1600);
+  });
+}
+
+// The contents column marks the section in view and opens its subsections.
+const tocSide = document.querySelector('.toc-side');
+if (tocSide) {
+  const links = new Map([...tocSide.querySelectorAll('a')].map((a) => [decodeURIComponent(a.hash.slice(1)), a]));
+  const heads = [...document.querySelectorAll('.doc h2[id], .doc h3[id]')].filter((h) => links.has(h.id));
+  let current = null;
+  let queued = false;
+  const spy = () => {
+    queued = false;
+    let at = heads[0];
+    for (const h of heads) {
+      if (h.getBoundingClientRect().top > innerHeight * 0.25) break;
+      at = h;
+    }
+    const link = links.get(at.id);
+    if (link === current) return;
+    current?.removeAttribute('aria-current');
+    for (const li of tocSide.querySelectorAll('li.open')) li.classList.remove('open');
+    link.setAttribute('aria-current', 'location');
+    link.closest('.toc-list > li').classList.add('open');
+    current = link;
+    // keep the entry in sight when the column itself scrolls
+    const box = tocSide.getBoundingClientRect();
+    const r = link.getBoundingClientRect();
+    if (r.top < box.top || r.bottom > box.bottom) tocSide.scrollTop += r.top - box.top - box.height / 3;
+  };
+  const queue = () => {
+    if (!queued) requestAnimationFrame(spy);
+    queued = true;
+  };
+  tocSide.classList.add('spy');
+  addEventListener('scroll', queue, { passive: true });
+  addEventListener('resize', queue);
+  spy();
+}
+
+// MathJax (1 MB) loads only once an equation comes within a few screens, so
+// it never holds up the top of the page. Until then the TeX shows as text.
+const maths = document.querySelectorAll('.doc .math');
+const mathjax = document.body.dataset.mathjax;
+if (maths.length && mathjax) {
+  let io;
+  const load = () => {
+    io?.disconnect();
+    const s = document.createElement('script');
+    s.src = mathjax;
+    s.async = true;
+    document.head.append(s);
+  };
+  if ('IntersectionObserver' in window) {
+    io = new IntersectionObserver((entries) => entries.some((e) => e.isIntersecting) && load(), { rootMargin: '2000px 0px' });
+    for (const m of maths) io.observe(m);
+  } else load();
+}
+
+// Code, tables and equations that scroll sideways can be scrolled from the
+// keyboard: they take focus only while they overflow.
+const scrollers = document.querySelectorAll('.doc pre, .doc .table-wrap, .doc div.math');
+if (scrollers.length) {
+  const mark = () => {
+    for (const el of scrollers) {
+      if (el.scrollWidth > el.clientWidth + 1) el.tabIndex = 0;
+      else el.removeAttribute('tabindex');
+    }
+  };
+  let wait;
+  if (document.readyState === 'complete') mark();
+  else addEventListener('load', mark);
+  addEventListener('resize', () => {
+    clearTimeout(wait);
+    wait = setTimeout(mark, 150);
+  });
+  document.addEventListener('typeset', mark); // MathJax finished (code/index.html)
+}

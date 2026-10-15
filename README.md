@@ -12,9 +12,12 @@ each paper and an AR(1) line under the intro, is kept on the `classic` branch:
 ```
 index.html                  the home page, with the birds
 contact/index.html          contact page: email, links, and the birds circling the address
+code/index.html             pyfgls documentation, generated from the pyfgls repository (see "Code page")
+code/intervals.png          its figure (copied there by the same script)
 404.html                    served by GitHub Pages for any missing path
 assets/site.css             all styles (tokens at the top)
-assets/site.js              birds in flight, BibTeX copy, theme switch (and, for the classic version, the AR(1) line and figures)
+assets/site.js              birds in flight, BibTeX copy, theme switch, the code page's copy buttons and contents (and, for the classic version, the AR(1) line and figures)
+assets/vendor/mathjax-3.2.2/  MathJax (tex-chtml.js and its fonts, Apache-2.0 licence alongside), loaded only by /code/
 assets/fonts/               EB Garamond 400 + italic, IBM Plex Mono 400 (woff2, Latin + Latin Extended-A; licences alongside)
 assets/og.png               1200×630 social preview
 favicon.svg                 the middle bird, simplified
@@ -150,6 +153,25 @@ the template or the birds, regenerate it with any headless Chrome:
   --virtual-time-budget=3000 --screenshot="$PWD/assets/og.png" "file://$PWD/scripts/og.html"
 ```
 
+## Code page
+
+`/code/` documents the Python package [pyfgls](https://github.com/emiliogcs/pyfgls),
+the software for the FGLS and Lasso papers (both link to it with `code ↗`). Its
+content is generated from that repository (README, `docs/`, docstrings) by
+`scripts/sync_site.sh` there, which writes between `<!-- pyfgls:start -->` and
+`<!-- pyfgls:end -->` in `code/index.html` and copies the figure. Do not edit
+that part by hand; edit the pyfgls docs and run, from the pyfgls checkout,
+
+```sh
+scripts/sync_site.sh "path/to/this/checkout"
+```
+
+The rest of `code/index.html` (head, meta tags, menu, footer) is ordinary site
+HTML. Math is typeset by MathJax 3.2.2 from `assets/vendor/`, loaded by
+`site.js` only when an equation comes near the screen; without JavaScript the
+TeX shows as text. The contents column is sticky from 1200px; narrower, the
+contents sit in a closed `<details>` above the documentation.
+
 ## Fonts
 
 Subset from the Google Fonts sources with fontTools, keeping kerning,
@@ -168,7 +190,8 @@ was instanced at weight 400 from the variable font first with
 ## Checks before pushing
 
 ```sh
-npx html-validate index.html 404.html cv/index.html working-papers/index.html
+npx html-validate index.html 404.html contact/index.html code/index.html cv/index.html working-papers/index.html
 ```
 
-No analytics, cookies or third-party requests: keep it that way.
+No analytics, cookies or third-party requests: keep it that way (MathJax is
+served from this site for that reason).
