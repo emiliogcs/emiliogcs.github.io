@@ -29,7 +29,7 @@
   <link rel="preload" href="/assets/fonts/eb-garamond-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/site.css">
-  <script>document.documentElement.classList.add("js")</script>
+  <script>document.documentElement.classList.add("js");try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
   <script type="module" src="/assets/site.js"></script>
 
   <script type="application/ld+json">
@@ -329,13 +329,19 @@
 
   <footer class="wrap grid section site-footer" id="contact" aria-labelledby="contact-h">
     <h2 class="label" id="contact-h">Contact</h2>
-    <div class="body">
+    <div class="body footer-row">
       <ul class="links">
         <li><a href="https://scholar.google.com/citations?user=ekQ7IjcAAAAJ">google scholar</a></li>
         <li><a href="https://github.com/emiliogcs">github</a></li>
         <li><a href="https://www.linkedin.com/in/emiliogcs/">linkedin</a></li>
         <li class="place">new york</li>
       </ul>
+      <div class="theme-switch" role="group" aria-labelledby="theme-label" hidden>
+        <span class="theme-label" id="theme-label">theme</span>
+        <button type="button" value="auto" aria-pressed="true">auto</button>
+        <button type="button" value="light" aria-pressed="false">light</button>
+        <button type="button" value="dark" aria-pressed="false">dark</button>
+      </div>
     </div>
   </footer>
 </body>

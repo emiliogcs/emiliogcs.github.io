@@ -8,7 +8,7 @@ is in the repository is what is deployed.
 index.html                  the whole site
 404.html                    served by GitHub Pages for any missing path
 assets/site.css             all styles (tokens at the top)
-assets/site.js              a fresh AR(1) line per visit, figure drawing, BibTeX copy
+assets/site.js              a fresh AR(1) line per visit, figure drawing, BibTeX copy, theme switch
 assets/fonts/               EB Garamond 400 + italic, IBM Plex Mono 400 (woff2, Latin + Latin Extended-A; licences alongside)
 assets/og.png               1200×630 social preview
 favicon.svg

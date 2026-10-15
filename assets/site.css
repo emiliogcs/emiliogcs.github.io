@@ -62,14 +62,27 @@
 
   color-scheme: light dark;
 }
+/* Dark follows the system unless the visitor picked a theme with the switch
+   in the footer (site.js sets data-theme="light" or "dark" on <html>). */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --paper: #0F0F0E;
     --ink: #ECE9E2;
     --muted: #8E8B84;
     --rule: #2A2926;
     --accent: #D27A68;
   }
+}
+:root[data-theme="dark"] {
+  --paper: #0F0F0E;
+  --ink: #ECE9E2;
+  --muted: #8E8B84;
+  --rule: #2A2926;
+  --accent: #D27A68;
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
 }
 @media (min-width: 900px) {
   :root {
@@ -101,10 +114,14 @@ body {
   overflow-wrap: break-word;
 }
 @media (prefers-color-scheme: dark) {
-  body {
+  :root:not([data-theme="light"]) body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+}
+:root[data-theme="dark"] body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1,
@@ -653,6 +670,57 @@ details[open] > summary .sign::before {
 .links .place {
   color: var(--muted);
 }
+.footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px 32px;
+}
+
+/* Theme switch: theme  auto · light · dark */
+.theme-switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 24px;
+}
+.theme-switch[hidden] {
+  display: none;
+}
+.theme-label {
+  margin-right: 0.8em;
+  color: var(--muted);
+}
+.theme-switch button {
+  min-height: 24px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+  transition: color 0.2s;
+}
+.theme-switch button + button::before {
+  content: "·";
+  content: "·" / "";
+  margin-inline: 0.6em;
+  color: var(--muted);
+  display: inline-block; /* keeps the dot out of the underline */
+}
+.theme-switch button:hover {
+  color: var(--accent);
+}
+.theme-switch button[aria-pressed="true"] {
+  color: var(--ink);
+  text-decoration-line: underline;
+}
 
 /* ---------------------------------------------------------------- 404 */
 
@@ -678,7 +746,8 @@ details[open] > summary .sign::before {
 /* ------------------------------------------------------------- print */
 
 @media print {
-  :root {
+  :root,
+  :root[data-theme] {
     --paper: #fff;
     --ink: #000;
     --muted: #444;
@@ -693,7 +762,8 @@ details[open] > summary .sign::before {
   .line,
   .skip,
   .actions,
-  .bib {
+  .bib,
+  .theme-switch {
     display: none !important;
   }
   .wrap {

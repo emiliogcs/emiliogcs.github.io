@@ -1,5 +1,6 @@
 // emiliogcs.com — the only script. Everything works without it; this adds
-// a fresh line on every visit, figures that draw themselves once, and BibTeX copying.
+// a fresh line on every visit, figures that draw themselves once, BibTeX copying,
+// and the theme switch in the footer.
 
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -187,4 +188,39 @@ for (const bib of document.querySelectorAll('details.bib')) {
       button.textContent = 'bibtex';
     }, 1600);
   });
+}
+
+// ------------------------------------------------------------------ theme
+// auto follows the system; light or dark is remembered in localStorage and
+// applied before first paint by the inline script in <head>.
+
+const switcher = document.querySelector('.theme-switch');
+if (switcher) {
+  const root = document.documentElement;
+  const metas = document.querySelectorAll('meta[name="theme-color"]');
+  const paper = { light: '#F5F3EE', dark: '#0F0F0E' };
+
+  const apply = (mode) => {
+    if (mode === 'light' || mode === 'dark') root.dataset.theme = mode;
+    else delete root.dataset.theme;
+    for (const m of metas) {
+      const own = (m.getAttribute('media') || '').includes('dark') ? 'dark' : 'light';
+      m.setAttribute('content', paper[root.dataset.theme || own]);
+    }
+    for (const b of switcher.querySelectorAll('button')) {
+      b.setAttribute('aria-pressed', String(b.value === (root.dataset.theme || 'auto')));
+    }
+  };
+
+  apply(root.dataset.theme || 'auto');
+  switcher.addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    apply(b.value);
+    try {
+      if (b.value === 'auto') localStorage.removeItem('theme');
+      else localStorage.setItem('theme', b.value);
+    } catch {}
+  });
+  switcher.hidden = false;
 }
