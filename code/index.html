@@ -88,6 +88,8 @@ statsmodels-style results, pandas support and the papers' simulation designs.</p
         <div class="actions">
           <a class="act" href="https://github.com/emiliogcs/pyfgls" target="_blank" rel="noopener">github<span class="vh"> (source code, opens in a new tab)</span> <span aria-hidden="true">↗</span></a>
           <span class="sep" aria-hidden="true">·</span>
+          <a class="act" href="https://pypi.org/project/pyfgls/" target="_blank" rel="noopener">pypi<span class="vh"> (the package on PyPI, opens in a new tab)</span> <span aria-hidden="true">↗</span></a>
+          <span class="sep" aria-hidden="true">·</span>
           <a class="act" href="https://doi.org/10.1016/j.jeconom.2026.106346" target="_blank" rel="noopener">paper 2026<span class="vh"> (Feasible GLS for Time Series Regression, opens in a new tab)</span> <span aria-hidden="true">↗</span></a>
           <span class="sep" aria-hidden="true">·</span>
           <a class="act" href="https://doi.org/10.1515/jem-2023-0007" target="_blank" rel="noopener">paper 2024<span class="vh"> (Estimation in the Presence of Heteroskedasticity of Unknown Form, opens in a new tab)</span> <span aria-hidden="true">↗</span></a>
@@ -232,22 +234,35 @@ statsmodels-style results, pandas support and the papers' simulation designs.</p
         </details>
 <section class="doc-section" aria-labelledby="install">
 <h2 id="install" class="doc-h2"><a href="#install">Install</a></h2>
-<div class="code" data-lang="shell"><div class="code-head"><span class="code-lang">shell</span></div><pre><code>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/emiliogcs/pyfgls<span class="w">       </span><span class="c1"># from GitHub, until it is on PyPI</span>
-pip<span class="w"> </span>install<span class="w"> </span>pyfgls<span class="w">                                         </span><span class="c1"># once released on PyPI</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"pyfgls[formula,plot]"</span><span class="w">                         </span><span class="c1"># + formula interface and diagnostic plots</span>
-pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[dev]"</span><span class="w">                                    </span><span class="c1"># development install from a clone</span></code></pre></div>
-<p>Until the PyPI release, the extras install from GitHub with
-<code>pip install &quot;pyfgls[formula,plot] @ git+https://github.com/emiliogcs/pyfgls&quot;</code>.</p>
-<p>Python ≥ 3.10. Core dependencies: NumPy, SciPy, pandas, scikit-learn, joblib. Optional:
-<code>formulaic</code> (<code>formula</code> extra), <code>matplotlib</code> (<code>plot</code> extra), <code>statsmodels</code> (only used in the
-test suite).</p>
+<p><code>pyfgls</code> is on <a href="https://pypi.org/project/pyfgls/">PyPI</a>:</p>
+<div class="code" data-lang="shell"><div class="code-head"><span class="code-lang">shell</span></div><pre><code>pip<span class="w"> </span>install<span class="w"> </span>pyfgls<span class="w">                    </span><span class="c1"># core</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"pyfgls[formula,plot]"</span><span class="w">    </span><span class="c1"># + formula interface and diagnostic plots</span>
+pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pyfgls<span class="w">          </span><span class="c1"># update to the latest release</span></code></pre></div>
+<p>Requires <strong>Python 3.10 or newer</strong>; tested on 3.10–3.13 on Linux, macOS and Windows. Core
+dependencies: NumPy, SciPy, pandas, scikit-learn, joblib. Optional: <code>formulaic</code>
+(<code>formula</code> extra), <code>matplotlib</code> (<code>plot</code> extra), <code>statsmodels</code> (only used in the test
+suite).</p>
 <p>A virtual environment keeps these dependencies apart from other projects:</p>
-<div class="code" data-lang="shell"><div class="code-head"><span class="code-lang">shell</span></div><pre><code>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<div class="code" data-lang="shell"><div class="code-head"><span class="code-lang">shell</span></div><pre><code>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
 <span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">            </span><span class="c1"># Windows: .venv\Scripts\activate</span>
 python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
-pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/emiliogcs/pyfgls</code></pre></div>
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>pyfgls</code></pre></div>
 <p>Check the installation; this prints the installed version:</p>
 <div class="code" data-lang="shell"><div class="code-head"><span class="code-lang">shell</span></div><pre><code>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import pyfgls; print(pyfgls.__version__)"</span></code></pre></div>
+<blockquote>
+<p><strong><code>pip</code> says &quot;No matching distribution found for pyfgls&quot;?</strong> Your <code>pip</code> runs on
+Python 3.9 or older (on macOS, the built-in <code>python3</code> is 3.9), and older versions of
+<code>pip</code> do not say that the Python version is the reason. Check with
+<code>python3 --version</code>, install Python 3.10+ (from python.org, or
+<code>brew install python@3.12</code>) and use a virtual environment:</p>
+<div class="code" data-lang="shell"><div class="code-head"><span class="code-lang">shell</span></div><pre><code>python3.12<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>pyfgls</code></pre></div>
+</blockquote>
+<p>Development version from GitHub:</p>
+<div class="code" data-lang="shell"><div class="code-head"><span class="code-lang">shell</span></div><pre><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"git+https://github.com/emiliogcs/pyfgls.git"</span><span class="w">   </span><span class="c1"># latest main</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/emiliogcs/pyfgls.git<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>pyfgls
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[dev]"</span><span class="w">                                      </span><span class="c1"># editable, with test tools</span></code></pre></div>
+<p>See <a href="https://github.com/emiliogcs/pyfgls/blob/main/CONTRIBUTING.md"><code>CONTRIBUTING.md</code></a> for the development workflow.</p>
 </section>
 <section class="doc-section" aria-labelledby="quickstart">
 <h2 id="quickstart" class="doc-h2"><a href="#quickstart">Quickstart</a></h2>
@@ -2616,6 +2631,12 @@ regressors.</p>
 </section>
 <section class="doc-section" aria-labelledby="faq">
 <h2 id="faq" class="doc-h2"><a href="#faq">FAQ and troubleshooting</a></h2>
+<p><strong><code>pip install pyfgls</code> says &quot;No matching distribution found&quot;. Why?</strong>
+<code>pyfgls</code> requires Python 3.10 or newer, and <code>pip</code> skips releases that do not support
+the Python it runs on. Older versions of <code>pip</code> do not say that this is the reason. On
+macOS, the built-in <code>python3</code> is 3.9. Check with <code>python3 --version</code>, install Python 3.10+
+(python.org or <code>brew install python@3.12</code>) and use a virtual environment:
+<code>python3.12 -m venv .venv &amp;&amp; source .venv/bin/activate &amp;&amp; python -m pip install pyfgls</code>.</p>
 <p><strong>Why not Cochrane–Orcutt?</strong>
 It estimates the AR filter from OLS residuals. When the regressors are only
 pre-determined, OLS is inconsistent, and so is the filter: in the [PG26] Table 1 design
@@ -2747,8 +2768,8 @@ Methods</em> 13(1), 29–48. https://doi.org/10.1515/jem-2023-0007</li>
 <span class="w">  </span><span class="na">year</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="s">{2024}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">doi</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="s">{10.1515/jem-2023-0007}</span>
 <span class="p">}</span></code></pre></div>
-<p>See also <a href="https://github.com/emiliogcs/pyfgls/blob/main/CITATION.cff"><code>CITATION.cff</code></a> to cite the software itself. License: MIT ©
-Emilio González-Coya. Questions and bug reports:
+<p>See also <a href="https://github.com/emiliogcs/pyfgls/blob/main/CITATION.cff"><code>CITATION.cff</code></a> to
+cite the software itself. License: MIT © Emilio González-Coya. Questions and bug reports:
 <a href="https://github.com/emiliogcs/pyfgls/issues">GitHub Issues</a>. Changes between versions:
 <a href="https://github.com/emiliogcs/pyfgls/blob/main/CHANGELOG.md"><code>CHANGELOG.md</code></a>.</p>
 </section>

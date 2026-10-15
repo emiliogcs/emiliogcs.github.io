@@ -1027,8 +1027,18 @@ details[open] > summary .sign::before {
   opacity: 1;
 }
 
-.doc-section :is(p, ul, ol, dl, .table-wrap, .code, div.math, .api-obj) {
+.doc-section :is(p, ul, ol, dl, .table-wrap, .code, div.math, .api-obj, blockquote) {
   margin-top: 16px;
+}
+/* Notes set apart (the README's "> ..."): a hairline at the left, as nested API entries. */
+.doc-section blockquote {
+  max-width: 680px;
+  margin-inline: 0;
+  padding-left: 16px;
+  border-left: 1px solid var(--rule);
+}
+.doc-section blockquote > :first-child {
+  margin-top: 0;
 }
 .doc-section :is(p, ul, ol, dl) {
   max-width: 680px;
