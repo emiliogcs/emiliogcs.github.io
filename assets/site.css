@@ -858,6 +858,404 @@ details[open] > summary .sign::before {
   text-decoration-line: underline;
 }
 
+/* ------------------------------------------------------------ code page */
+/* /code/: the pyfgls documentation, generated from its repository
+   (scripts/build_site_page.py there). Prose in the serif, code and
+   metadata in mono, code between hairlines as the BibTeX entries are.
+   Contents: a sticky column from 1200px, a closed <details> above that. */
+
+.code-intro .statement {
+  max-width: 15em;
+}
+.pitch {
+  margin-top: 16px;
+  font-style: italic;
+  color: var(--muted);
+}
+.lede {
+  margin-top: 24px;
+  text-wrap: pretty;
+}
+.lede > * + * {
+  margin-top: 0.7em;
+}
+.lede ul {
+  padding-left: 1.2em;
+  list-style: disc;
+}
+.lede li + li {
+  margin-top: 0.4em;
+}
+.code-intro .actions {
+  margin-top: 28px;
+}
+
+.docs > .toc-side {
+  display: none;
+}
+@media (min-width: 1200px) {
+  .docs > .toc-side {
+    display: block;
+    grid-column: 1 / 3;
+    position: sticky;
+    top: 24px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  .toc-top {
+    display: none;
+  }
+}
+.toc-side,
+.toc-top {
+  font-family: var(--mono);
+  font-variant-numeric: lining-nums;
+  font-size: 12px;
+  line-height: 18px;
+}
+.toc-title {
+  margin-bottom: 8px;
+  line-height: 24px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.toc-list,
+.toc-list ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.toc-list ol {
+  margin: 2px 0 8px 1px;
+  padding-left: 12px;
+  border-left: 1px solid var(--rule);
+}
+.toc-list a {
+  display: block;
+  padding: 3px 0; /* 24px targets */
+  color: var(--muted);
+}
+.toc-list > li > a {
+  color: var(--ink);
+}
+.toc-list a:hover,
+.toc-list a[aria-current] {
+  color: var(--accent);
+}
+.toc-list code {
+  font: inherit;
+}
+/* With the script, only the section in view shows its subsections. */
+.toc-side.spy .toc-list ol {
+  display: none;
+}
+.toc-side.spy .toc-list li.open > ol {
+  display: block;
+}
+
+.toc-top {
+  margin-bottom: 48px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule); /* the section's own rule is just above */
+  font-size: 13px;
+}
+.toc-top > summary {
+  display: inline-block;
+  min-height: 24px;
+  line-height: 24px;
+  transition: color 0.2s;
+}
+.toc-top > summary:hover {
+  color: var(--accent);
+}
+.toc-top nav {
+  padding: 8px 0 4px;
+}
+
+.doc {
+  min-width: 0;
+  max-width: 800px;
+}
+.doc-section + .doc-section {
+  margin-top: 96px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+}
+.doc-h2 {
+  margin-bottom: 32px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 24px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.doc-section h3,
+.doc-section h4,
+.doc-section h5,
+.doc-section h6 {
+  font-weight: 400;
+}
+.doc-section h3 {
+  margin: 72px 0 16px;
+  font-size: clamp(24px, 2.6vw, 30px);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.doc-h2 + h3 {
+  margin-top: 0;
+}
+.doc-section h4 {
+  margin: 40px 0 12px;
+  font-size: 21px;
+  line-height: 1.3;
+}
+.doc :is(h2, h3, h4, h5, h6)[id] {
+  scroll-margin-top: 24px;
+}
+.doc-section :is(h3, h4) > a::after {
+  content: " #";
+  content: " #" / "";
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.doc-section :is(h3, h4) > a:is(:hover, :focus-visible)::after {
+  opacity: 1;
+}
+
+.doc-section :is(p, ul, ol, dl, .table-wrap, .code, div.math, .api-obj) {
+  margin-top: 16px;
+}
+.doc-section :is(p, ul, ol, dl) {
+  max-width: 680px;
+  text-wrap: pretty;
+}
+.doc-section :is(h3, h4, h5, .doc-h2) + :is(p, ul, ol, dl, .table-wrap, .code, div.math) {
+  margin-top: 0;
+}
+.doc-section ul {
+  padding-left: 1.2em;
+  list-style: disc;
+}
+.doc-section ol {
+  padding-left: 1.5em;
+}
+.doc-section li + li {
+  margin-top: 0.4em;
+}
+.doc-section li > p {
+  margin-top: 0;
+}
+.doc-section a:not(.api-h a):not(:is(h3, h4, h5) a) {
+  text-decoration-line: underline;
+  text-decoration-color: var(--rule);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  transition: color 0.2s, text-decoration-color 0.2s;
+}
+.doc-section a:not(.api-h a):not(:is(h3, h4, h5) a):hover {
+  text-decoration-color: currentColor;
+}
+.doc-section code,
+.lede code {
+  font-family: var(--mono);
+  font-size: 0.8em;
+  font-variant-numeric: lining-nums;
+}
+.doc-section img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-top: 24px;
+  mix-blend-mode: multiply; /* the figure's white falls into the paper */
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .doc-section img {
+    filter: invert(1) hue-rotate(180deg);
+    mix-blend-mode: screen;
+  }
+}
+:root[data-theme="dark"] .doc-section img {
+  filter: invert(1) hue-rotate(180deg);
+  mix-blend-mode: screen;
+}
+
+/* Tables: rows between hairlines, mono heads; wide ones scroll in place. */
+.table-wrap {
+  overflow-x: auto;
+}
+.doc-section table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  font-size: 15px;
+  line-height: 1.45;
+}
+.doc-section th,
+.doc-section td {
+  padding: 7px 16px 7px 0;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
+.doc-section th {
+  border-bottom-color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--muted);
+}
+.doc-section th code {
+  font-size: 1em;
+}
+.doc-section :is(th, td):last-child {
+  padding-right: 0;
+}
+
+/* Code: a mono label and the copy button above, hairlines either side. */
+.code {
+  border-block: 1px solid var(--rule);
+}
+.doc-section .code {
+  margin-top: 20px;
+}
+.code-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 4px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 24px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.code-head .act {
+  float: none;
+  letter-spacing: 0;
+  font-size: 12px;
+}
+.code pre {
+  overflow-x: auto;
+  padding: 4px 0 14px;
+  font: 13px/1.6 var(--mono);
+  font-variant-numeric: lining-nums;
+  font-variant-ligatures: none;
+  tab-size: 4;
+}
+.code pre code {
+  font: inherit;
+}
+.code.sig pre {
+  padding-top: 12px;
+}
+@media (max-width: 479px) {
+  .code pre {
+    font-size: 12px;
+  }
+}
+/* Highlighting in the site's three inks: keywords in the accent, comments
+   and prompts muted, everything else as text. */
+.code :is(.k, .kc, .kd, .kn, .kp, .kr, .kt, .ow, .nd) {
+  color: var(--accent);
+}
+.code :is(.c, .c1, .ch, .cm, .cp, .cpf, .cs, .gp) {
+  color: var(--muted);
+}
+
+/* Math: MathJax typesets \( \) and \[ \]; until then the TeX shows as mono. */
+.math {
+  font-family: var(--mono);
+  font-size: 0.8em;
+}
+.math:has(mjx-container) {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.math {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 4px;
+}
+mjx-container[display="true"] {
+  margin: 0 !important;
+}
+
+/* API reference */
+.api-note,
+.api-inherits {
+  color: var(--muted);
+}
+.doc-section .api-obj {
+  margin-top: 48px;
+}
+.doc-section .api-obj .api-obj {
+  margin-top: 32px;
+  padding-left: 16px;
+  border-left: 1px solid var(--rule);
+}
+.doc-section .api-h {
+  margin: 0 0 8px;
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 24px;
+  overflow-wrap: anywhere;
+}
+.doc-section h5.api-h,
+.doc-section h6.api-h {
+  font-size: 14px;
+}
+.api-h code {
+  font-size: 1em;
+}
+.api-kind {
+  margin-left: 0.6em;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.doc-section .api-label {
+  margin-top: 20px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 24px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.doc-section .api-label + :is(.api-items, .code) {
+  margin-top: 4px;
+}
+.api-items dt {
+  margin-top: 12px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 20px;
+}
+.api-items dt:first-child {
+  margin-top: 0;
+}
+.api-items dt code {
+  font-size: 1em;
+}
+.api-type {
+  color: var(--muted);
+}
+.api-items dd {
+  margin: 2px 0 0 16px;
+  font-size: 17px;
+  line-height: 1.55;
+}
+.doc-section .api-items dd p {
+  margin-top: 0;
+}
+
 /* ---------------------------------------------------------------- 404 */
 
 .lost {
@@ -901,8 +1299,15 @@ details[open] > summary .sign::before {
   .bib,
   .theme-switch,
   .flock,
-  .flight {
+  .flight,
+  .toc,
+  .toc-top,
+  .copy-code {
     display: none !important;
+  }
+  .code pre {
+    overflow: visible;
+    white-space: pre-wrap;
   }
   .wrap {
     width: auto;

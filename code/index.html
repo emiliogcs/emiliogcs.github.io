@@ -1,0 +1,2783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pyfgls — Feasible GLS for Python</title>
+  <meta name="description" content="pyfgls: feasible GLS in Python for time series regression with serially correlated errors and for heteroskedasticity of unknown form (Perron and González-Coya 2026; González-Coya and Perron 2024). Install, examples, user guide, theory and API reference.">
+  <link rel="canonical" href="https://emiliogcs.com/code/">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#F5F3EE" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0F0F0E" media="(prefers-color-scheme: dark)">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://emiliogcs.com/code/">
+  <meta property="og:site_name" content="Emilio González Coya">
+  <meta property="og:title" content="pyfgls — Feasible GLS for Python">
+  <meta property="og:description" content="Feasible GLS for time series regression and for heteroskedasticity of unknown form: install, examples, user guide, theory and API reference.">
+  <meta property="og:image" content="https://emiliogcs.com/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Emilio González Coya, economist: time series and financial econometrics. A line drawing of two birds in flight.">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="pyfgls — Feasible GLS for Python">
+  <meta name="twitter:description" content="Feasible GLS for time series regression and for heteroskedasticity of unknown form: install, examples, user guide, theory and API reference.">
+  <meta name="twitter:image" content="https://emiliogcs.com/assets/og.png">
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/assets/fonts/eb-garamond-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/ibm-plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/site.css">
+  <script>document.documentElement.classList.add("js");try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script type="module" src="/assets/site.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    "name": "pyfgls",
+    "description": "Feasible GLS for time series regression and for heteroskedasticity of unknown form.",
+    "url": "https://emiliogcs.com/code/",
+    "codeRepository": "https://github.com/emiliogcs/pyfgls",
+    "programmingLanguage": "Python",
+    "license": "https://opensource.org/licenses/MIT",
+    "author": { "@type": "Person", "@id": "https://emiliogcs.com/#person", "name": "Emilio González Coya", "url": "https://emiliogcs.com/" },
+    "citation": ["https://doi.org/10.1016/j.jeconom.2026.106346", "https://doi.org/10.1515/jem-2023-0007"]
+  }
+  </script>
+</head>
+<body class="docs-page" data-mathjax="/assets/vendor/mathjax-3.2.2/tex-chtml.js">
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="wrap site-header">
+    <p class="name"><a href="/">Emilio González Coya</a></p>
+    <nav class="nav" aria-label="Primary">
+      <ul>
+        <li><a href="/#research">research</a></li>
+        <li><a href="/code/" aria-current="page">code</a></li>
+        <li><a href="/contact/">contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <!-- The documentation below is generated from the pyfgls repository
+         (README.md, docs/ and the docstrings) by its scripts/sync_site.sh.
+         Edit it there, not here. -->
+    <!-- pyfgls:start -->
+    <section class="wrap grid intro code-intro" aria-labelledby="pyfgls">
+      <div class="body reading">
+        <h1 class="statement" id="pyfgls">pyfgls — Feasible GLS for Python</h1>
+        <p class="pitch">Feasible GLS for time series regression and for heteroskedasticity of unknown form.</p>
+        <div class="lede">
+<p><code>pyfgls</code> implements the feasible generalized least squares (FGLS) estimators of</p>
+<ul>
+<li><strong>[PG26]</strong> Perron, P. and González-Coya, E. (2026). <em>Feasible GLS for time series
+regression.</em> Journal of Econometrics 258, 106346 — <strong>serially correlated errors</strong>;</li>
+<li><strong>[GP24]</strong> González-Coya, E. and Perron, P. (2024). <em>Estimation in the presence of
+heteroskedasticity of unknown form: a Lasso-based approach.</em> Journal of Econometric
+Methods 13(1), 29–48 — <strong>heteroskedasticity of unknown form</strong>;</li>
+</ul>
+<p>and their combination for time series with both problems ([PG26] Supplement S-4).</p>
+<p>The message of both papers is the same: GLS is not a fragile luxury. Done the way they
+propose, it is consistent in situations where OLS is not, it is (essentially) never less
+precise than OLS, it is often far more precise, and its confidence intervals have
+accurate coverage and are shorter. <code>pyfgls</code> packages those procedures with
+statsmodels-style results, pandas support and the papers' simulation designs.</p>
+</div>
+        <div class="actions">
+          <a class="act" href="https://github.com/emiliogcs/pyfgls" target="_blank" rel="noopener">github<span class="vh"> (source code, opens in a new tab)</span> <span aria-hidden="true">↗</span></a>
+          <span class="sep" aria-hidden="true">·</span>
+          <a class="act" href="https://doi.org/10.1016/j.jeconom.2026.106346" target="_blank" rel="noopener">paper 2026<span class="vh"> (Feasible GLS for Time Series Regression, opens in a new tab)</span> <span aria-hidden="true">↗</span></a>
+          <span class="sep" aria-hidden="true">·</span>
+          <a class="act" href="https://doi.org/10.1515/jem-2023-0007" target="_blank" rel="noopener">paper 2024<span class="vh"> (Estimation in the Presence of Heteroskedasticity of Unknown Form, opens in a new tab)</span> <span aria-hidden="true">↗</span></a>
+          <span class="sep" aria-hidden="true">·</span>
+          <a class="act" href="#citation">bibtex</a>
+        </div>
+        <p class="note">version 0.1.0 · python ≥ 3.10 · MIT license</p>
+      </div>
+    </section>
+
+    <div class="wrap grid section docs">
+      <nav class="toc toc-side" aria-label="Contents">
+        <p class="toc-title">contents</p>
+        <ol class="toc-list">
+          <li><a href="#install">Install</a></li>
+          <li><a href="#quickstart">Quickstart</a>
+          <ol>
+            <li><a href="#quickstart-1-serial-correlation-with-a-non-exogenous-regressor">1. Serial correlation with a non-exogenous regressor</a></li>
+            <li><a href="#quickstart-2-heteroskedasticity-of-unknown-form">2. Heteroskedasticity of unknown form</a></li>
+            <li><a href="#quickstart-3-both-problems">3. Both problems</a></li>
+            <li><a href="#quickstart-4-robust-versus-naive-intervals">4. Robust versus naive intervals</a></li>
+            <li><a href="#quickstart-5-formula-interface">5. Formula interface</a></li>
+          </ol></li>
+          <li><a href="#choosing">When to use which estimator</a>
+          <ol>
+            <li><a href="#time-series-regressions-with-serially-correlated-errors-pg26-section-6">Time-series regressions with serially correlated errors ([PG26], Section 6)</a></li>
+            <li><a href="#cross-sections-with-heteroskedasticity-of-unknown-form-gp24-section-6">Cross sections with heteroskedasticity of unknown form ([GP24], Section 6)</a></li>
+          </ol></li>
+          <li><a href="#guide">User guide</a>
+          <ol>
+            <li><a href="#data-requirements">Data requirements</a></li>
+            <li><a href="#serialfgls-serial-correlation-pg26"><code>SerialFGLS</code> — serial correlation ([PG26])</a></li>
+            <li><a href="#lassofgls-heteroskedasticity-gp24"><code>LassoFGLS</code> — heteroskedasticity ([GP24])</a></li>
+            <li><a href="#fgls-both-and-the-general-interface"><code>FGLS</code> — both, and the general interface</a></li>
+            <li><a href="#inference-options-cov-type">Inference options (<code>cov_type</code>)</a></li>
+            <li><a href="#reading-summary">Reading <code>summary()</code></a></li>
+            <li><a href="#interpreting-nonexogeneity-share">Interpreting <code>nonexogeneity_share</code></a></li>
+            <li><a href="#lagged-dependent-variables">Lagged dependent variables</a></li>
+            <li><a href="#many-candidate-covariates">Many candidate covariates</a></li>
+            <li><a href="#results-fglsresults">Results (<code>FGLSResults</code>)</a></li>
+            <li><a href="#diagnostics">Diagnostics</a></li>
+            <li><a href="#benchmarks-bootstrap-simulation-designs">Benchmarks, bootstrap, simulation designs</a></li>
+            <li><a href="#scikit-learn">scikit-learn</a></li>
+            <li><a href="#reproducibility">Reproducibility</a></li>
+            <li><a href="#performance">Performance</a></li>
+          </ol></li>
+          <li><a href="#theory">Theory</a>
+          <ol>
+            <li><a href="#serial-correlation-pg26">Serial correlation ([PG26])</a></li>
+            <li><a href="#heteroskedasticity-of-unknown-form-gp24">Heteroskedasticity of unknown form ([GP24])</a></li>
+            <li><a href="#both-problems-pg26-supplement-s-4">Both problems ([PG26] Supplement S-4)</a></li>
+            <li><a href="#implementation-choices-and-open-items">Implementation choices and open items</a></li>
+          </ol></li>
+          <li><a href="#api">API reference</a>
+          <ol>
+            <li><a href="#api-estimators">Estimators</a></li>
+            <li><a href="#api-results">Results</a></li>
+            <li><a href="#api-benchmarks">Benchmarks</a></li>
+            <li><a href="#api-diagnostics">Diagnostics</a></li>
+            <li><a href="#api-scikit-learn-wrapper">scikit-learn wrapper</a></li>
+            <li><a href="#api-plots">Plots</a></li>
+            <li><a href="#api-simulation-designs">Simulation designs</a></li>
+            <li><a href="#api-exceptions-and-warnings">Exceptions and warnings</a></li>
+          </ol></li>
+          <li><a href="#replication">Replication</a>
+          <ol>
+            <li><a href="#pg26-table-1-t-500-ar1-08-non-exogenous-regressor">[PG26] Table 1 (T = 500, AR(1) 0.8, non-exogenous regressor)</a></li>
+            <li><a href="#pg26-general-case-t-200-08">[PG26] general case (T = 200, <span class="math">\(\rho_x\)</span> = 0.8)</a></li>
+            <li><a href="#gp24-table-1-slope-emse-of-lasso-fgls-relative-to-ols">[GP24] Table 1 (slope eMSE of Lasso-FGLS relative to OLS)</a></li>
+            <li><a href="#pg26-supplement-s-4-serial-correlation-and-heteroskedasticity-t-200">[PG26] Supplement S-4: serial correlation and heteroskedasticity (T = 200)</a></li>
+          </ol></li>
+          <li><a href="#faq">FAQ and troubleshooting</a></li>
+          <li><a href="#citation">Citation</a></li>
+        </ol>
+      </nav>
+      <div class="body doc">
+        <details class="toc-top">
+          <summary>contents <span class="sign" aria-hidden="true"></span></summary>
+          <nav aria-label="Contents of this page">
+        <ol class="toc-list">
+          <li><a href="#install">Install</a></li>
+          <li><a href="#quickstart">Quickstart</a>
+          <ol>
+            <li><a href="#quickstart-1-serial-correlation-with-a-non-exogenous-regressor">1. Serial correlation with a non-exogenous regressor</a></li>
+            <li><a href="#quickstart-2-heteroskedasticity-of-unknown-form">2. Heteroskedasticity of unknown form</a></li>
+            <li><a href="#quickstart-3-both-problems">3. Both problems</a></li>
+            <li><a href="#quickstart-4-robust-versus-naive-intervals">4. Robust versus naive intervals</a></li>
+            <li><a href="#quickstart-5-formula-interface">5. Formula interface</a></li>
+          </ol></li>
+          <li><a href="#choosing">When to use which estimator</a>
+          <ol>
+            <li><a href="#time-series-regressions-with-serially-correlated-errors-pg26-section-6">Time-series regressions with serially correlated errors ([PG26], Section 6)</a></li>
+            <li><a href="#cross-sections-with-heteroskedasticity-of-unknown-form-gp24-section-6">Cross sections with heteroskedasticity of unknown form ([GP24], Section 6)</a></li>
+          </ol></li>
+          <li><a href="#guide">User guide</a>
+          <ol>
+            <li><a href="#data-requirements">Data requirements</a></li>
+            <li><a href="#serialfgls-serial-correlation-pg26"><code>SerialFGLS</code> — serial correlation ([PG26])</a></li>
+            <li><a href="#lassofgls-heteroskedasticity-gp24"><code>LassoFGLS</code> — heteroskedasticity ([GP24])</a></li>
+            <li><a href="#fgls-both-and-the-general-interface"><code>FGLS</code> — both, and the general interface</a></li>
+            <li><a href="#inference-options-cov-type">Inference options (<code>cov_type</code>)</a></li>
+            <li><a href="#reading-summary">Reading <code>summary()</code></a></li>
+            <li><a href="#interpreting-nonexogeneity-share">Interpreting <code>nonexogeneity_share</code></a></li>
+            <li><a href="#lagged-dependent-variables">Lagged dependent variables</a></li>
+            <li><a href="#many-candidate-covariates">Many candidate covariates</a></li>
+            <li><a href="#results-fglsresults">Results (<code>FGLSResults</code>)</a></li>
+            <li><a href="#diagnostics">Diagnostics</a></li>
+            <li><a href="#benchmarks-bootstrap-simulation-designs">Benchmarks, bootstrap, simulation designs</a></li>
+            <li><a href="#scikit-learn">scikit-learn</a></li>
+            <li><a href="#reproducibility">Reproducibility</a></li>
+            <li><a href="#performance">Performance</a></li>
+          </ol></li>
+          <li><a href="#theory">Theory</a>
+          <ol>
+            <li><a href="#serial-correlation-pg26">Serial correlation ([PG26])</a></li>
+            <li><a href="#heteroskedasticity-of-unknown-form-gp24">Heteroskedasticity of unknown form ([GP24])</a></li>
+            <li><a href="#both-problems-pg26-supplement-s-4">Both problems ([PG26] Supplement S-4)</a></li>
+            <li><a href="#implementation-choices-and-open-items">Implementation choices and open items</a></li>
+          </ol></li>
+          <li><a href="#api">API reference</a>
+          <ol>
+            <li><a href="#api-estimators">Estimators</a></li>
+            <li><a href="#api-results">Results</a></li>
+            <li><a href="#api-benchmarks">Benchmarks</a></li>
+            <li><a href="#api-diagnostics">Diagnostics</a></li>
+            <li><a href="#api-scikit-learn-wrapper">scikit-learn wrapper</a></li>
+            <li><a href="#api-plots">Plots</a></li>
+            <li><a href="#api-simulation-designs">Simulation designs</a></li>
+            <li><a href="#api-exceptions-and-warnings">Exceptions and warnings</a></li>
+          </ol></li>
+          <li><a href="#replication">Replication</a>
+          <ol>
+            <li><a href="#pg26-table-1-t-500-ar1-08-non-exogenous-regressor">[PG26] Table 1 (T = 500, AR(1) 0.8, non-exogenous regressor)</a></li>
+            <li><a href="#pg26-general-case-t-200-08">[PG26] general case (T = 200, <span class="math">\(\rho_x\)</span> = 0.8)</a></li>
+            <li><a href="#gp24-table-1-slope-emse-of-lasso-fgls-relative-to-ols">[GP24] Table 1 (slope eMSE of Lasso-FGLS relative to OLS)</a></li>
+            <li><a href="#pg26-supplement-s-4-serial-correlation-and-heteroskedasticity-t-200">[PG26] Supplement S-4: serial correlation and heteroskedasticity (T = 200)</a></li>
+          </ol></li>
+          <li><a href="#faq">FAQ and troubleshooting</a></li>
+          <li><a href="#citation">Citation</a></li>
+        </ol>
+          </nav>
+        </details>
+<section class="doc-section" aria-labelledby="install">
+<h2 id="install" class="doc-h2"><a href="#install">Install</a></h2>
+<div class="code" data-lang="shell"><div class="code-head"><span class="code-lang">shell</span></div><pre><code>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/emiliogcs/pyfgls<span class="w">       </span><span class="c1"># from GitHub, until it is on PyPI</span>
+pip<span class="w"> </span>install<span class="w"> </span>pyfgls<span class="w">                                         </span><span class="c1"># once released on PyPI</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"pyfgls[formula,plot]"</span><span class="w">                         </span><span class="c1"># + formula interface and diagnostic plots</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[dev]"</span><span class="w">                                    </span><span class="c1"># development install from a clone</span></code></pre></div>
+<p>Until the PyPI release, the extras install from GitHub with
+<code>pip install &quot;pyfgls[formula,plot] @ git+https://github.com/emiliogcs/pyfgls&quot;</code>.</p>
+<p>Python ≥ 3.10. Core dependencies: NumPy, SciPy, pandas, scikit-learn, joblib. Optional:
+<code>formulaic</code> (<code>formula</code> extra), <code>matplotlib</code> (<code>plot</code> extra), <code>statsmodels</code> (only used in the
+test suite).</p>
+<p>A virtual environment keeps these dependencies apart from other projects:</p>
+<div class="code" data-lang="shell"><div class="code-head"><span class="code-lang">shell</span></div><pre><code>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">            </span><span class="c1"># Windows: .venv\Scripts\activate</span>
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/emiliogcs/pyfgls</code></pre></div>
+<p>Check the installation; this prints the installed version:</p>
+<div class="code" data-lang="shell"><div class="code-head"><span class="code-lang">shell</span></div><pre><code>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import pyfgls; print(pyfgls.__version__)"</span></code></pre></div>
+</section>
+<section class="doc-section" aria-labelledby="quickstart">
+<h2 id="quickstart" class="doc-h2"><a href="#quickstart">Quickstart</a></h2>
+<h3 id="quickstart-1-serial-correlation-with-a-non-exogenous-regressor"><a href="#quickstart-1-serial-correlation-with-a-non-exogenous-regressor">1. Serial correlation with a non-exogenous regressor</a></h3>
+<p>The [PG26] Table 1 design: AR(1) errors with ρ = 0.8 and a regressor <code>w_t = v_t + e_{t−1}</code>
+that responds to last period's shock.</p>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">pyfgls</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyfgls.simulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">serial_dgp</span>
+
+<span class="n">sim</span> <span class="o">=</span> <span class="n">serial_dgp</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">SerialFGLS</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">compare_ols</span><span class="p">())</span></code></pre></div>
+<div class="code" data-lang="output"><div class="code-head"><span class="code-lang">output</span></div><pre><code>==============================================================================
+                           FGLS Regression Results
+==============================================================================
+Dep. variable:                       y  Inference:                      normal
+Method:                  FGLS (serial)  AR order k*:        1  [BIC (kmax=15)]
+Observations:                      500  AR coefs rho:                   0.7668
+Effective obs.:                    499  Non-exog. share:                 0.015
+Covariance:                     robust
+------------------------------------------------------------------------------
+                 coef    std err          z      P&gt;|z|      0.025      0.975
+------------------------------------------------------------------------------
+const          0.8768     0.1951      4.495      0.000     0.4945     1.2591
+x1             0.9927     0.0258     38.449      0.000     0.9421     1.0433
+==============================================================================
+Notes:
+[1] Covariance: [PG26] eq. (29), robust to non-exogenous (pre-determined) regressors.
+[2] Collinear lagged columns dropped from the Durbin regression: L1.const
+                     OLS  FGLS (serial)
+const coef      0.913171       0.876773
+      std err   0.131491       0.195064
+      CI width  0.515434       0.764637
+x1    coef      1.412530       0.992690
+      std err   0.067605       0.025818
+      CI width  0.265006       0.101206</code></pre></div>
+<p>The true slope is 1: OLS is off by 0.41 (it is inconsistent here), FGLS is on target with
+an interval less than half as wide.</p>
+<h3 id="quickstart-2-heteroskedasticity-of-unknown-form"><a href="#quickstart-2-heteroskedasticity-of-unknown-form">2. Heteroskedasticity of unknown form</a></h3>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">pyfgls</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyfgls.simulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">hetero_dgp</span>
+
+<span class="n">sim</span> <span class="o">=</span> <span class="n">hetero_dgp</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="n">skedastic</span><span class="o">=</span><span class="s2">"x2"</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Var(u | x) = x²</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">LassoFGLS</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span></code></pre></div>
+<div class="code" data-lang="output"><div class="code-head"><span class="code-lang">output</span></div><pre><code>==============================================================================
+                           FGLS Regression Results
+==============================================================================
+Dep. variable:                       y  Inference:                      normal
+Method:                  FGLS (hetero)  Skedastic fit:                   lasso
+Observations:                      400  Selected z:              x1^2, log(x1)
+Effective obs.:                    400  df_hat:                              3
+Covariance:                     robust  Var. ratio max/min:                20.1
+------------------------------------------------------------------------------
+                 coef    std err          z      P&gt;|z|      0.025      0.975
+------------------------------------------------------------------------------
+const          1.3531     0.2825      4.790      0.000     0.7995     1.9068
+x1             0.7736     0.1455      5.317      0.000     0.4884     1.0588
+==============================================================================
+Notes:
+[1] Covariance: [GP24] eqs. (6)+(8), sandwich with bias correction.</code></pre></div>
+<h3 id="quickstart-3-both-problems"><a href="#quickstart-3-both-problems">3. Both problems</a></h3>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">pyfgls</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyfgls.simulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">combined_dgp</span>
+
+<span class="n">sim</span> <span class="o">=</span> <span class="n">combined_dgp</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="n">ar</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,),</span> <span class="n">skedastic</span><span class="o">=</span><span class="s2">"x2"</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">FGLS</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">compare_stages</span><span class="p">())</span>  <span class="c1"># F-C: serial correction only; F-CH: both</span></code></pre></div>
+<div class="code" data-lang="output"><div class="code-head"><span class="code-lang">output</span></div><pre><code>                F-C (serial)  F-CH (serial+hetero)
+const coef          0.849550              0.716812
+      std err       0.364408              0.299758
+      CI width      1.428453              1.175031
+x1    coef          1.001988              1.044079
+      std err       0.168275              0.133527
+      CI width      0.659625              0.523416</code></pre></div>
+<p><img src="intervals.png" alt="OLS-HAC vs FGLS intervals" width="975" height="345" loading="lazy" decoding="async"></p>
+<p><em>Persistent AR(2) errors, T = 200: the OLS-HAC interval is centred far from the truth and
+is about three times as wide as the FGLS interval.</em></p>
+<h3 id="quickstart-4-robust-versus-naive-intervals"><a href="#quickstart-4-robust-versus-naive-intervals">4. Robust versus naive intervals</a></h3>
+<p>When a regressor responds to past shocks, the textbook GLS variance ([PG26] eq. 27)
+ignores that the AR filter was estimated and its intervals are too short. The default
+variance (eq. 29) accounts for it.</p>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">pyfgls</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyfgls.simulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">serial_dgp</span>
+
+<span class="c1"># AR(1) errors (rho = 0.5) and a regressor x_t = 0.5 x_{t-1} + v_t + e_{t-1}</span>
+<span class="c1"># that responds to last period's shock: pre-determined, not exogenous</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">serial_dgp</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">ar</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,),</span> <span class="n">rho_x</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">burn</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">SerialFGLS</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+<span class="n">robust</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>  <span class="c1"># default: [PG26] eq. (29)</span>
+<span class="n">naive</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"naive"</span><span class="p">)</span>  <span class="c1"># eq. (27): valid for exogenous regressors only</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"nonexogeneity_share = </span><span class="si">{</span><span class="n">robust</span><span class="o">.</span><span class="n">nonexogeneity_share</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pf</span><span class="o">.</span><span class="n">compare</span><span class="p">([</span><span class="n">naive</span><span class="p">,</span> <span class="n">robust</span><span class="p">],</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">"naive"</span><span class="p">,</span> <span class="s2">"robust"</span><span class="p">]))</span></code></pre></div>
+<div class="code" data-lang="output"><div class="code-head"><span class="code-lang">output</span></div><pre><code>nonexogeneity_share = 0.342
+                   naive    robust
+const coef      1.219315  1.219315
+      std err   0.144750  0.146042
+      CI width  0.567409  0.572474
+x1    coef      0.987909  0.987909
+      std err   0.052561  0.067858
+      CI width  0.206037  0.266000</code></pre></div>
+<p>The estimates are identical; only the variance differs. For the slope the robust standard
+error is about 30% larger: the naive interval would under-cover. With exogenous regressors
+the share is close to 0 and the two coincide.</p>
+<h3 id="quickstart-5-formula-interface"><a href="#quickstart-5-formula-interface">5. Formula interface</a></h3>
+<p>With the <code>formula</code> extra, models can be written as formulas on a pandas DataFrame; <code>lag()</code>
+creates lags, and the names and the (time) index are carried into the results.</p>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyfgls</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyfgls.simulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">serial_dgp</span>
+
+<span class="n">sim</span> <span class="o">=</span> <span class="n">serial_dgp</span><span class="p">(</span><span class="mi">240</span><span class="p">,</span> <span class="n">burn</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span><span class="s2">"y"</span><span class="p">:</span> <span class="n">sim</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">:</span> <span class="n">sim</span><span class="o">.</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]},</span>
+    <span class="n">index</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">period_range</span><span class="p">(</span><span class="s2">"2005-01"</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">240</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">"M"</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">SerialFGLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">"y ~ x + lag(x)"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">missing</span><span class="o">=</span><span class="s2">"drop"</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span></code></pre></div>
+<div class="code" data-lang="output"><div class="code-head"><span class="code-lang">output</span></div><pre><code>==============================================================================
+                           FGLS Regression Results
+==============================================================================
+Dep. variable:                       y  Inference:                      normal
+Method:                  FGLS (serial)  AR order k*:        1  [BIC (kmax=12)]
+Observations:                      239  AR coefs rho:                   0.8244
+Effective obs.:                    238  Non-exog. share:                 0.064
+Covariance:                     robust
+------------------------------------------------------------------------------
+                 coef    std err          z      P&gt;|z|      0.025      0.975
+------------------------------------------------------------------------------
+const          1.6427     0.3616      4.543      0.000     0.9340     2.3514
+x              0.9894     0.0413     23.971      0.000     0.9085     1.0703
+lag(x)        -0.0072     0.0411     -0.175      0.861    -0.0878     0.0734
+==============================================================================
+Notes:
+[1] Covariance: [PG26] eq. (29), robust to non-exogenous (pre-determined) regressors.
+[2] Collinear lagged columns dropped from the Durbin regression: L1.const, L1.x</code></pre></div>
+<p><code>missing=&quot;drop&quot;</code> drops the first month, which <code>lag(x)</code> leaves empty. Note [2]: the Durbin
+regression already contains the lags of every regressor, so the lag of the constant and
+<code>L1.x</code>, which duplicates <code>lag(x)</code>, are dropped there.</p>
+</section>
+<section class="doc-section" aria-labelledby="choosing">
+<h2 id="choosing" class="doc-h2"><a href="#choosing">When to use which estimator</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Your data</th>
+<th>Problem</th>
+<th>Use</th>
+<th>Paper</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Time series, stationary</td>
+<td>Serially correlated errors</td>
+<td><code>SerialFGLS(y, X)</code></td>
+<td>[PG26]</td>
+</tr>
+<tr>
+<td>Time series, stationary</td>
+<td>Serial correlation <strong>and</strong> heteroskedastic innovations</td>
+<td><code>FGLS(y, X)</code> (F-CH)</td>
+<td>[PG26] Suppl. S-4</td>
+</tr>
+<tr>
+<td>Cross section (random sample)</td>
+<td>Heteroskedasticity of unknown form</td>
+<td><code>LassoFGLS(y, X)</code></td>
+<td>[GP24]</td>
+</tr>
+<tr>
+<td>Time series with lags of <code>y</code> as regressors</td>
+<td>Serial correlation</td>
+<td><code>SerialFGLS(y, X, lagged_dep_vars=[...])</code></td>
+<td>[PG26] §4.2</td>
+</tr>
+<tr>
+<td>Errors known to be MA(1), e.g. 2-step-ahead forecast errors</td>
+<td>MA(1) with large negative θ</td>
+<td><code>SerialFGLS(y, X, ma1=True)</code> (GMA)</td>
+<td>[PG26] §5</td>
+</tr>
+<tr>
+<td>Many stochastic regressors in a time series</td>
+<td>Lag selection</td>
+<td>add <code>ic_penalty=&quot;params&quot;</code></td>
+<td>see <em>Implementation choices</em> below</td>
+</tr>
+<tr>
+<td>You only want robust standard errors for OLS</td>
+<td>—</td>
+<td><code>pf.benchmarks.ols(y, X, cov_type=&quot;HAC&quot;)</code> / <code>&quot;HC3&quot;</code></td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>FGLS</code> is the general class: <code>serial=None</code> turns off the serial-correlation correction
+and <code>hetero=None</code> the heteroskedasticity correction, so <code>FGLS(y, X, hetero=None)</code> is the
+same estimator as <code>SerialFGLS(y, X)</code> and <code>FGLS(y, X, serial=None)</code> the same as
+<code>LassoFGLS(y, X)</code>.</p>
+<p>Compared with the usual alternatives:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Instead of</th>
+<th>Use</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OLS + HAC standard errors</td>
+<td><code>SerialFGLS</code></td>
+<td>OLS is inconsistent when the regressors respond to past shocks (pre-determined, not exogenous); FGLS stays consistent, is more precise, and its intervals cover better with persistent errors.</td>
+</tr>
+<tr>
+<td>Cochrane–Orcutt</td>
+<td><code>SerialFGLS</code></td>
+<td>Cochrane–Orcutt estimates the AR filter from OLS residuals and inherits their inconsistency; FGLS estimates it from the Durbin regression.</td>
+</tr>
+<tr>
+<td>The textbook GLS variance (<code>cov_type=&quot;naive&quot;</code>)</td>
+<td>the default <code>cov_type=&quot;robust&quot;</code></td>
+<td>The naive variance is valid only for exogenous regressors; the robust one ([PG26] eq. 29) is valid for pre-determined ones too and costs nothing when they are exogenous.</td>
+</tr>
+<tr>
+<td>OLS + HC standard errors</td>
+<td><code>LassoFGLS</code></td>
+<td>Never noticeably worse than OLS in the [GP24] designs, much more precise under heteroskedasticity.</td>
+</tr>
+<tr>
+<td>Parametric WLS (<code>&quot;wls_s1&quot;</code>, <code>&quot;wls_s2&quot;</code>) or SVR (<code>&quot;svr&quot;</code>)</td>
+<td>the adaptive Lasso (default)</td>
+<td>WLS can be worse than OLS when the variance driver is not among its covariates; SVR is competitive in MSE but its intervals cover less accurately.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="time-series-regressions-with-serially-correlated-errors-pg26-section-6"><a href="#time-series-regressions-with-serially-correlated-errors-pg26-section-6">Time-series regressions with serially correlated errors ([PG26], Section 6)</a></h3>
+<p>The concluding remarks of [PG26] translate into the following recommendations.</p>
+<ol>
+<li><strong>Use FGLS as the default.</strong> In a linear time-series regression with stationary
+errors, estimate by FGLS with the AR order chosen by BIC and build confidence
+intervals with the exogeneity-robust variance of eq. (29) — <code>SerialFGLS(y, X).fit()</code>
+does exactly this. If the regressors happen to be exogenous, the robust correction
+vanishes asymptotically, so nothing is lost; if they are not, it is what makes the
+intervals reliable. OLS, by contrast, is generally <em>inconsistent</em> when the regressors
+react to past shocks, and Cochrane–Orcutt inherits that inconsistency.</li>
+<li><strong>Check that the regressors are pre-determined.</strong> FGLS needs the regressors to be
+uncorrelated with current and future innovations (not with past ones). Use the
+variable-addition LM test of Remark 9,
+<code>pf.diagnostics.test_predetermined(y, X)</code>. If it rejects, add lags of the relevant
+regressors to the model and refit; if the problem comes from omitted variables that
+are not observed, an instrumental-variables procedure is needed instead (outside the
+scope of this package).</li>
+<li><strong>Large negative moving-average components need care.</strong> When the errors may contain an
+MA term with a large negative coefficient (typical of multi-step forecast errors), a
+finite autoregression approximates them poorly and BIC may stop too early, which shows
+up as intervals that under-cover. If you know the MA structure, use a tailored
+transformation such as the GMA estimator (<code>SerialFGLS(..., ma1=True)</code>).</li>
+<li><strong>Lagged dependent variables.</strong> With lags of <code>y</code> among the regressors, OLS is
+inconsistent under serial correlation; declare them (<code>lagged_dep_vars=[&quot;ylag&quot;]</code>) so the
+AR filter is recovered from the lagged regressors (Section 4.2).</li>
+<li><strong>Multi-step predictive regressions.</strong> Under rational expectations the h-step forecast
+errors are MA(h−1) and both OLS and FGLS are consistent; FGLS is more efficient as long
+as the implied MA process is invertible. If it may be non-invertible, FGLS is only
+consistent with exogenous regressors — be cautious.</li>
+<li><strong>Know your maintained assumptions.</strong> The advantages of GLS over OLS with HAC standard
+errors rest on stationarity, invertibility of the error process and pre-determined
+regressors. When these are plausible — as they usually are — the gains in precision
+and in the reliability of inference are substantial. Use <code>check_stationarity=True</code> to
+screen for unit roots, and watch for <code>NonStationaryWarning</code> (an estimated AR filter
+with a root near the unit circle).</li>
+<li><strong>Heteroskedastic innovations</strong> ([PG26] Remark 12). Either keep FGLS for the serial
+correlation and make the variance heteroskedasticity-robust (<code>cov_type=&quot;HC3&quot;</code>), or —
+recommended — add the Lasso-based weighting of [GP24]: <code>FGLS(y, X)</code> (F-CH). With
+homoskedastic innovations F-CH is equivalent to correcting for serial correlation only,
+so there is no cost.</li>
+</ol>
+<p>How much does <code>nonexogeneity_share</code> matter? It reports how large the eq. (29) correction
+is relative to the textbook GLS variance: near 0 the regressors behave as exogenous; large
+values mean the naive interval would under-cover.</p>
+<h3 id="cross-sections-with-heteroskedasticity-of-unknown-form-gp24-section-6"><a href="#cross-sections-with-heteroskedasticity-of-unknown-form-gp24-section-6">Cross sections with heteroskedasticity of unknown form ([GP24], Section 6)</a></h3>
+<ol>
+<li><strong>Lasso-FGLS is a safe replacement for OLS + robust standard errors.</strong> In all the
+designs of [GP24] it was never noticeably worse than OLS (at most a few percent of MSE
+when there is no heteroskedasticity, because the Lasso then selects nothing and the
+weights are constant), and it is markedly better when heteroskedasticity is present.</li>
+<li><strong>You do not need to know the variance function.</strong> It is enough that the candidate
+covariates <code>z</code> include at least one variable correlated with what drives the variance,
+plus some non-linear transforms. The Lasso picks what fits the variance pattern in the
+sample; it need not pick the &quot;true&quot; form, and it does not need to.</li>
+<li><strong>Prefer many variables and few transforms.</strong> Adding many candidate variables works
+well; adding many functional forms of the same variable creates near-collinearity and
+helps little. Trigonometric terms (<code>cos w</code>, <code>cos 2w</code>, i.e. Chebyshev-type terms) are a
+good flexible choice: <code>LassoFGLS(y, X, transforms=(&quot;linear&quot;, &quot;trig&quot;))</code> or build your own
+<code>z</code> with <code>pyfgls.hetero.make_dictionary</code>. The default dictionary
+<code>{x, x², log x, (log x)², cos x, cos 2x}</code> per regressor follows the paper's simulations.</li>
+<li><strong>Always use the bias-corrected robust variance</strong> (the default, eq. (8)). The fitted
+variance function is an approximation, so model-based standard errors are not
+reliable; the corrected sandwich gives close-to-nominal coverage with intervals that
+are much shorter than OLS-HC intervals under heteroskedasticity.</li>
+<li><strong>Avoid unrestricted parametric WLS when the variance driver is uncertain.</strong> The
+Romano–Wolf WLS estimators (<code>skedastic=&quot;wls_s1&quot;</code>, <code>&quot;wls_s2&quot;</code>) can be much <em>worse</em> than
+OLS when the true driver is not among their covariates; SVR (<code>&quot;svr&quot;</code>) is competitive in
+MSE but tends to give less accurate coverage. The adaptive Lasso dominates both.</li>
+</ol>
+</section>
+<section class="doc-section" aria-labelledby="guide">
+<h2 id="guide" class="doc-h2"><a href="#guide">User guide</a></h2>
+<h3 id="data-requirements"><a href="#data-requirements">Data requirements</a></h3>
+<ul>
+<li><code>y</code>, <code>X</code> may be NumPy arrays, lists, pandas <code>Series</code>/<code>DataFrame</code>; names and the index
+are carried into the results. Include a column of ones for an intercept (a warning is
+issued if there is none; implicit intercepts such as a full set of dummies are
+recognised).</li>
+<li><strong>Time order matters</strong> for serial-correlation corrections. A pandas index must be sorted
+and unique; a <code>DatetimeIndex</code>/<code>PeriodIndex</code> with gaps raises <code>TimeIndexError</code> unless
+<code>allow_gaps=True</code> (lags are then positional, e.g. trading days). Panels (<code>MultiIndex</code>)
+are not supported.</li>
+<li>Missing values raise <code>MissingDataError</code> by default; <code>missing=&quot;drop&quot;</code> drops
+leading/trailing rows for time series (interior gaps would corrupt the lags) and any
+incomplete row for cross sections. Infinite values always raise.</li>
+<li>Rank-deficient <code>X</code> raises <code>CollinearityError</code> naming the offending columns. Lagged
+constants, trends and seasonal dummies in the Durbin regression are dropped
+automatically.</li>
+<li>Formulas (needs <code>formulaic</code>): <code>pf.FGLS.from_formula(&quot;y ~ x1 + np.log(x2) + lag(x1)&quot;, data=df, missing=&quot;drop&quot;)</code>; the intercept is named <code>const</code>.</li>
+</ul>
+<h3 id="serialfgls-serial-correlation-pg26"><a href="#serialfgls-serial-correlation-pg26"><code>SerialFGLS</code> — serial correlation ([PG26])</a></h3>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="n">pf</span><span class="o">.</span><span class="n">SerialFGLS</span><span class="p">(</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">ar_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ic</span><span class="o">=</span><span class="s2">"bic"</span><span class="p">,</span>
+    <span class="n">kmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">min_lags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ic_penalty</span><span class="o">=</span><span class="s2">"order"</span><span class="p">,</span>
+    <span class="n">lagged_dep_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">wallis_regressor</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span>
+    <span class="n">exog</span><span class="o">=</span><span class="s2">"predetermined"</span><span class="p">,</span>
+    <span class="n">ma1</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">missing</span><span class="o">=</span><span class="s2">"raise"</span><span class="p">,</span>
+    <span class="n">allow_gaps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_stationarity</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"robust"</span><span class="p">,</span> <span class="n">use_t</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code></pre></div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ar_order</code></td>
+<td>Fix the AR order instead of selecting it.</td>
+</tr>
+<tr>
+<td><code>ic</code></td>
+<td><code>&quot;bic&quot;</code> (default, as in [PG26]) or <code>&quot;aic&quot;</code>.</td>
+</tr>
+<tr>
+<td><code>kmax</code></td>
+<td>Largest order considered: default <code>int(12·(T/200)^¼)</code> (12 at T = 200); <code>&quot;theory&quot;</code> = ⌊(T/ln T)^⅓⌋; or an int. Capped so the Durbin regression uses ≤ 50% of the sample as regressors.</td>
+</tr>
+<tr>
+<td><code>min_lags</code></td>
+<td>Lower bound on the order; <code>&quot;adjusted&quot;</code> = ⌈(ln T)^1.5⌉ (Suppl. Lemma A.2).</td>
+</tr>
+<tr>
+<td><code>ic_penalty</code></td>
+<td><code>&quot;order&quot;</code> (paper: penalise the AR order) or <code>&quot;params&quot;</code> (penalise every coefficient a lag adds — use it with several stochastic regressors).</td>
+</tr>
+<tr>
+<td><code>lagged_dep_vars</code></td>
+<td>Names/positions of regressors that are lags of <code>y</code> (Wallis recovery, §4.2).</td>
+</tr>
+<tr>
+<td><code>wallis_regressor</code></td>
+<td><code>&quot;auto&quot;</code> (largest |t|), <code>&quot;median&quot;</code>, or a regressor name.</td>
+</tr>
+<tr>
+<td><code>exog</code></td>
+<td>Your assumption; only affects notes and the default first-stage correction of <code>FGLS</code>.</td>
+</tr>
+<tr>
+<td><code>ma1</code></td>
+<td>GMA estimator for MA(1) errors (§5).</td>
+</tr>
+<tr>
+<td><code>cov_type</code></td>
+<td><code>&quot;robust&quot;</code> (eq. 29, default), <code>&quot;naive&quot;</code> (eq. 27, exogenous regressors only), <code>&quot;HC0&quot;</code>–<code>&quot;HC3&quot;</code> (eq. 29 with heteroskedasticity weights), <code>&quot;bootstrap&quot;</code> (sieve).</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="lassofgls-heteroskedasticity-gp24"><a href="#lassofgls-heteroskedasticity-gp24"><code>LassoFGLS</code> — heteroskedasticity ([GP24])</a></h3>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="n">pf</span><span class="o">.</span><span class="n">LassoFGLS</span><span class="p">(</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">z</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span>
+    <span class="n">skedastic</span><span class="o">=</span><span class="s2">"lasso"</span><span class="p">,</span>
+    <span class="n">variance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">delta</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">delta_scale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">cv_folds</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">psi_grid</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="n">lambda_rule</span><span class="o">=</span><span class="s2">"min"</span><span class="p">,</span>
+    <span class="n">fold_scheme</span><span class="o">=</span><span class="s2">"random"</span><span class="p">,</span>
+    <span class="n">cv_weights</span><span class="o">=</span><span class="s2">"fold"</span><span class="p">,</span>
+    <span class="n">weight_clip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">transforms</span><span class="o">=</span><span class="p">(</span><span class="s2">"linear"</span><span class="p">,</span> <span class="s2">"poly2"</span><span class="p">,</span> <span class="s2">"log"</span><span class="p">,</span> <span class="s2">"trig"</span><span class="p">),</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">missing</span><span class="o">=</span><span class="s2">"raise"</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"robust"</span><span class="p">)</span></code></pre></div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>z</code></td>
+<td>Candidate covariates: <code>&quot;auto&quot;</code> (dictionary from the regressors), a list of regressor names, or your own matrix/DataFrame (any number of columns, even more than observations).</td>
+</tr>
+<tr>
+<td><code>skedastic</code></td>
+<td><code>&quot;lasso&quot;</code> (adaptive Lasso, default), <code>&quot;svr&quot;</code>, <code>&quot;wls_s1&quot;</code>, <code>&quot;wls_s2&quot;</code> (Romano–Wolf), <code>&quot;none&quot;</code> (OLS + HC3), <code>&quot;known&quot;</code> or an array/callable of known variances (infeasible GLS).</td>
+</tr>
+<tr>
+<td><code>delta</code>, <code>delta_scale</code></td>
+<td>Floor in log(max(û², δ²)); δ = 0.1 in the units of <code>y</code> (paper), or <code>delta_scale=True</code> for δ·σ̂_OLS.</td>
+</tr>
+<tr>
+<td><code>cv_folds</code>, <code>psi_grid</code>, <code>lambda_rule</code></td>
+<td>10-fold CV over (λ, ψ) with common folds; penalty at the CV minimum (<code>&quot;min&quot;</code>, paper) or <code>&quot;1se&quot;</code>.</td>
+</tr>
+<tr>
+<td><code>fold_scheme</code></td>
+<td><code>&quot;random&quot;</code> (paper) or <code>&quot;blocked&quot;</code> (dependent data).</td>
+</tr>
+<tr>
+<td><code>cv_weights</code></td>
+<td>Re-estimate the ridge weights within each fold (<code>&quot;fold&quot;</code>, default) or once (<code>&quot;full&quot;</code>).</td>
+</tr>
+<tr>
+<td><code>weight_clip</code></td>
+<td>Optional quantile winsorisation of the fitted log-variance.</td>
+</tr>
+<tr>
+<td><code>cov_type</code></td>
+<td><code>&quot;robust&quot;</code> (eq. 8 for Lasso/SVR, eq. 7 for WLS, HC3 otherwise), <code>&quot;nonrobust&quot;</code>, <code>&quot;HC0&quot;</code>–<code>&quot;HC3&quot;</code>, <code>&quot;bootstrap&quot;</code> (wild).</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="fgls-both-and-the-general-interface"><a href="#fgls-both-and-the-general-interface"><code>FGLS</code> — both, and the general interface</a></h3>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="n">pf</span><span class="o">.</span><span class="n">FGLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">serial</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span> <span class="n">hetero</span><span class="o">=</span><span class="s2">"lasso"</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span> <span class="n">first_stage_correction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span></code></pre></div>
+<p><code>serial ∈ {&quot;auto&quot;, &quot;fixed&quot;, &quot;ma1&quot;, None}</code>, <code>hetero ∈ {&quot;lasso&quot;, &quot;svr&quot;, &quot;wls_s1&quot;, &quot;wls_s2&quot;, &quot;known&quot;, None}</code>; all <code>SerialFGLS</code> and <code>LassoFGLS</code> options are accepted. The combined fit
+(F-CH) applies the [GP24] weights to the quasi-differenced regression, with candidate
+covariates built from the <strong>unfiltered</strong> regressors. <code>first_stage_correction</code> (default on
+for pre-determined regressors) adds the eq. (29)-type term for the estimated AR filter to
+the sandwich variance; in our simulations with non-exogenous regressors it raises the
+coverage of 95% intervals from 0.78 to 0.94. <code>cov_type</code>: <code>&quot;robust&quot;</code>, <code>&quot;HC0&quot;</code>, <code>&quot;HC3&quot;</code>,
+<code>&quot;bootstrap&quot;</code>.</p>
+<h3 id="inference-options-cov-type"><a href="#inference-options-cov-type">Inference options (<code>cov_type</code>)</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th><code>cov_type</code></th>
+<th>Serial (<code>SerialFGLS</code>)</th>
+<th>Heteroskedastic (<code>LassoFGLS</code>)</th>
+<th>Combined (<code>FGLS</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&quot;robust&quot;</code> (default)</td>
+<td>[PG26] eq. (29)</td>
+<td>[GP24] eq. (8) / (7)</td>
+<td>Suppl. (A.4)–(A.5)</td>
+</tr>
+<tr>
+<td><code>&quot;naive&quot;</code> / <code>&quot;nonrobust&quot;</code></td>
+<td>eq. (27)</td>
+<td>model-based</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>&quot;HC0&quot;</code>–<code>&quot;HC3&quot;</code></td>
+<td>eq. (29) with HC weights</td>
+<td>White-type</td>
+<td>HC0 / HC3</td>
+</tr>
+<tr>
+<td><code>&quot;bootstrap&quot;</code></td>
+<td>sieve</td>
+<td>wild</td>
+<td>sieve (wild)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Use <code>use_t=True</code> for Student-t critical values with <code>n_eff − q</code> degrees of freedom.</p>
+<h3 id="reading-summary"><a href="#reading-summary">Reading <code>summary()</code></a></h3>
+<p><code>print(res.summary())</code> prints three blocks: a header that describes the fit, the
+coefficient table, and numbered notes. <code>res.summary(alpha=0.10)</code> gives 90% intervals.
+Quick example 1 (serial correlation) and Quick example 2 (heteroskedasticity) show
+typical output.</p>
+<h4 id="header"><a href="#header">Header</a></h4>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Line</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Dep. variable</code></td>
+<td>Name of <code>y</code>: the Series name, the left-hand side of a formula, or <code>y</code> for arrays.</td>
+</tr>
+<tr>
+<td><code>Method</code></td>
+<td><code>FGLS (serial)</code> ([PG26]), <code>GMA (MA(1))</code> ([PG26] §5), <code>FGLS (hetero)</code> ([GP24]), <code>F-CH (serial+hetero)</code> (both); <code>OLS</code> when every correction is switched off.</td>
+</tr>
+<tr>
+<td><code>Observations</code></td>
+<td>Rows used, after any <code>missing=&quot;drop&quot;</code>.</td>
+</tr>
+<tr>
+<td><code>Effective obs.</code></td>
+<td>Rows in the final regression. Quasi-differencing with an AR(k*) filter loses the first k* rows (there is no Prais–Winsten step), so this is <code>Observations − k*</code>; variances are scaled by it. GMA transforms all rows.</td>
+</tr>
+<tr>
+<td><code>Covariance</code></td>
+<td>The <code>cov_type</code> used; <code>robust</code> by default.</td>
+</tr>
+<tr>
+<td><code>Inference</code></td>
+<td><code>normal</code> critical values, or <code>Student-t</code> with <code>n_eff − q</code> degrees of freedom when you fit with <code>use_t=True</code>.</td>
+</tr>
+<tr>
+<td><code>AR order k*</code></td>
+<td>The selected AR order and how it was chosen: <code>[BIC (kmax=15)]</code> means BIC over the orders 0 to 15, all estimated on a common sample; <code>fixed</code> when you passed <code>ar_order</code>.</td>
+</tr>
+<tr>
+<td><code>AR coefs rho</code></td>
+<td>The estimated filter ρ̂₁, …, ρ̂ₖ*, with A(L) = 1 − ρ₁L − … − ρₖ*L^k*; <code>-</code> when k* = 0 (no serial correlation detected, so OLS with valid standard errors).</td>
+</tr>
+<tr>
+<td><code>Non-exog. share</code></td>
+<td>How large the [PG26] eq. (29) correction is relative to the naive variance: near 0 the regressors behave as exogenous. See <a href="#interpreting-nonexogeneity-share">Interpreting <code>nonexogeneity_share</code></a>.</td>
+</tr>
+<tr>
+<td><code>Lagged dep. vars</code></td>
+<td>Regressors you declared as lags of <code>y</code> (<code>lagged_dep_vars</code>).</td>
+</tr>
+<tr>
+<td><code>MA coef theta</code>, <code>Durbin order k_T</code></td>
+<td>GMA only: the estimated MA(1) coefficient and the number of lags in the Durbin regression used to estimate it.</td>
+</tr>
+<tr>
+<td><code>Skedastic fit</code></td>
+<td>How the variance function was estimated: <code>lasso</code> (default), <code>svr</code>, <code>wls_s1</code>, <code>wls_s2</code>, <code>known</code>.</td>
+</tr>
+<tr>
+<td><code>Selected z</code></td>
+<td>Candidate covariates with a non-zero coefficient in the skedastic fit. <code>(none)</code> means constant weights, so the estimate is OLS. Long lists are cut with <code>...</code>; the full list is <code>res.hetero.selected_z</code>.</td>
+</tr>
+<tr>
+<td><code>df_hat</code></td>
+<td>Degrees of freedom of the skedastic fit (non-zero coefficients, intercept included), used by the bias correction of [GP24] eq. (8).</td>
+</tr>
+<tr>
+<td><code>Var. ratio max/min</code></td>
+<td>Largest over smallest fitted variance: how unequal the GLS weights are (1 means equal weights).</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="coefficient-table"><a href="#coefficient-table">Coefficient table</a></h4>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>coef</code></td>
+<td>The FGLS estimate, <code>res.params</code>.</td>
+</tr>
+<tr>
+<td><code>std err</code></td>
+<td>Square root of the diagonal of <code>res.cov_params()</code>, <code>res.bse</code>.</td>
+</tr>
+<tr>
+<td><code>z</code> (or <code>t</code>)</td>
+<td><code>coef / std err</code>, <code>res.tvalues</code>.</td>
+</tr>
+<tr>
+<td><code>P&gt;|z|</code></td>
+<td>Two-sided p-value for the hypothesis that the coefficient is 0, <code>res.pvalues</code>.</td>
+</tr>
+<tr>
+<td><code>0.025</code>, <code>0.975</code></td>
+<td>Bounds of the 95% confidence interval, <code>res.conf_int()</code>; other levels with <code>alpha</code>.</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>res.to_frame()</code> returns the whole table as a DataFrame, and <code>res.to_dict()</code> and
+<code>res.to_json()</code> serialise the fit.</p>
+<h4 id="notes"><a href="#notes">Notes</a></h4>
+<p>The notes say which variance formula was used, with its equation in the paper, and
+report what the estimator did on its own: columns of the Durbin regression dropped
+because they are collinear (the lag of the constant, of trends, of seasonal dummies, or a
+lag that duplicates another regressor), or a declared assumption that the data contradict
+(<code>exog=&quot;exogenous&quot;</code> with a large <code>nonexogeneity_share</code>). Problems found while fitting are
+raised as warnings at fit time (see the FAQ).</p>
+<h4 id="comparing-fits"><a href="#comparing-fits">Comparing fits</a></h4>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Call</th>
+<th>Table</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>res.compare_ols()</code></td>
+<td>This fit next to OLS on the same data, with HAC standard errors (Andrews quadratic-spectral kernel, automatic bandwidth) when the fit corrects serial correlation and HC3 otherwise; override with <code>cov_type=</code>.</td>
+</tr>
+<tr>
+<td><code>res.compare_stages()</code></td>
+<td>A combined fit next to its serial-only stage: F-C versus F-CH.</td>
+</tr>
+<tr>
+<td><code>pf.compare([res1, res2, ...], names=[...])</code></td>
+<td>Any fits side by side, including the benchmarks in <code>pf.benchmarks</code> (OLS, Cochrane–Orcutt, the Durbin estimator, infeasible GLS).</td>
+</tr>
+</tbody>
+</table></div>
+<p>Each table has one row block per coefficient with its estimate, standard error and
+confidence-interval width, and one column per fit.</p>
+<h3 id="interpreting-nonexogeneity-share"><a href="#interpreting-nonexogeneity-share">Interpreting <code>nonexogeneity_share</code></a></h3>
+<p>The robust variance of [PG26] eq. (29) is the naive variance (eq. (27)) plus a term that
+accounts for the estimation of the AR filter. That term is proportional to
+<span class="math">\(g_j = E[\tilde x_t u_{t-j}]\)</span>, which is zero when the regressors are exogenous.</p>
+<p><code>res.nonexogeneity_share</code> reports the average, over coefficients, of the correction
+relative to the naive variance, and <code>res.serial.nonexogeneity_by_coef</code> gives it per
+coefficient:</p>
+<ul>
+<li><strong>≈ 0</strong> — the regressors behave as exogenous; naive and robust intervals coincide.</li>
+<li><strong>&gt; 0.1</strong> — the first-stage correction matters; the naive intervals would under-cover.</li>
+</ul>
+<p>The robust variance is valid in both cases, so it is always the default. Declaring
+<code>exog=&quot;exogenous&quot;</code> does not change the estimates; it only adds a note to the summary when
+the share is large.</p>
+<h3 id="lagged-dependent-variables"><a href="#lagged-dependent-variables">Lagged dependent variables</a></h3>
+<p>When lags of <span class="math">\(y\)</span> are regressors (e.g. a dynamic model <span class="math">\(y_t = \alpha y_{t-1} + \gamma w_t + u_t\)</span>
+with AR errors), OLS is inconsistent and the Durbin-regression coefficients on lagged
+<span class="math">\(y\)</span> mix <span class="math">\(\alpha\)</span> with the AR coefficients of the errors. Declare the lagged dependent
+variables so <code>pyfgls</code> can recover the AR coefficients from the lagged <em>stochastic</em>
+regressors (the Wallis ratio, [PG26] Section 4.2):</p>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">"const"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">"ylag"</span><span class="p">:</span> <span class="n">y</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s2">"w"</span><span class="p">:</span> <span class="n">w</span><span class="p">})</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">SerialFGLS</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">X</span><span class="p">,</span> <span class="n">lagged_dep_vars</span><span class="o">=</span><span class="p">[</span><span class="s2">"ylag"</span><span class="p">])</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">res</span><span class="o">.</span><span class="n">serial</span><span class="o">.</span><span class="n">wallis_regressors</span>  <span class="c1"># regressor(s) used for the ratio</span></code></pre></div>
+<ul>
+<li><code>wallis_regressor=&quot;auto&quot;</code> (default) uses the regressor whose contemporaneous Durbin
+coefficient has the largest <span class="math">\(|t|\)</span>; <code>&quot;median&quot;</code> takes the median of the ratios over all
+eligible regressors; or name one.</li>
+<li>At least one stochastic regressor that is not a lag of <span class="math">\(y\)</span> is required.</li>
+<li>If you forget to declare a regressor that equals a lag of <span class="math">\(y\)</span>, <code>pyfgls</code> warns
+(<code>LaggedDependentWarning</code>) and refuses to run the standard algorithm.</li>
+</ul>
+<p>This path is less tested than the standard one; the test suite checks it by simulation
+(bias and coverage of <span class="math">\(\hat\alpha\)</span> and <span class="math">\(\hat\gamma\)</span>).</p>
+<h3 id="many-candidate-covariates"><a href="#many-candidate-covariates">Many candidate covariates</a></h3>
+<p>The adaptive Lasso is designed for large candidate sets:</p>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="n">Z</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df</span><span class="p">[</span><span class="n">cols</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">cols</span><span class="p">]),</span> <span class="n">df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># your dictionary</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">LassoFGLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">res</span><span class="o">.</span><span class="n">selected_z</span></code></pre></div>
+<p>Tips:</p>
+<ul>
+<li>Candidates are standardised internally; their units do not matter.</li>
+<li><code>z</code> may have more columns than observations; cross-validation then becomes noisier
+and slower (a <code>SampleSizeWarning</code> tells you).</li>
+<li>Use <code>pyfgls.hetero.make_dictionary(X, names, transforms=(&quot;poly2&quot;, &quot;log&quot;, &quot;trig&quot;))</code> to
+build the default dictionary and extend it.</li>
+<li>With dependent data use <code>fold_scheme=&quot;blocked&quot;</code>.</li>
+<li><code>lambda_rule=&quot;1se&quot;</code> gives sparser fits; the default <code>&quot;min&quot;</code> follows [GP24].</li>
+<li>Extreme weights trigger a <code>WeightWarning</code>; <code>weight_clip=(0.01, 0.99)</code> winsorises the
+fitted log-variance (off by default to match the paper).</li>
+</ul>
+<h3 id="results-fglsresults"><a href="#results-fglsresults">Results (<code>FGLSResults</code>)</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Attribute / method</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>params</code>, <code>bse</code>, <code>tvalues</code>, <code>pvalues</code></td>
+<td>pandas Series labelled by regressor</td>
+</tr>
+<tr>
+<td><code>conf_int(alpha)</code>, <code>cov_params()</code></td>
+<td>intervals and covariance (normal, or Student-t with <code>use_t=True</code>)</td>
+</tr>
+<tr>
+<td><code>summary()</code>, <code>to_frame()</code>, <code>to_dict()</code>, <code>to_json()</code></td>
+<td>formatted output</td>
+</tr>
+<tr>
+<td><code>resid</code>, <code>fittedvalues</code>, <code>resid_final</code>, <code>predict(X_new)</code></td>
+<td>full-sample residuals, final-stage (filtered/weighted) residuals, predictions</td>
+</tr>
+<tr>
+<td><code>wald_test(&quot;x1 = x2, x3 = 0&quot;)</code></td>
+<td>Wald test of linear restrictions (strings or <code>(R, r)</code>)</td>
+</tr>
+<tr>
+<td><code>compare_ols()</code>, <code>compare_stages()</code>, <code>pf.compare([...])</code></td>
+<td>side-by-side tables</td>
+</tr>
+<tr>
+<td><code>ar_order</code>, <code>rho</code>, <code>ar_roots</code>, <code>bic_path</code>, <code>nonexogeneity_share</code></td>
+<td>serial block (<code>res.serial</code>)</td>
+</tr>
+<tr>
+<td><code>selected_z</code>, <code>skedastic_coef</code>, <code>weights</code>, <code>df_hat</code></td>
+<td>heteroskedasticity block (<code>res.hetero</code>)</td>
+</tr>
+<tr>
+<td><code>stage_serial</code>, <code>stage_hetero</code></td>
+<td>F-C and F-CH fits of a combined estimate</td>
+</tr>
+<tr>
+<td><code>plot_diagnostics()</code></td>
+<td>residuals, their ACF, BIC path / fitted variance, coefficients vs OLS</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="diagnostics"><a href="#diagnostics">Diagnostics</a></h3>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">pyfgls</span><span class="w"> </span><span class="kn">import</span> <span class="n">diagnostics</span>
+
+<span class="n">diagnostics</span><span class="o">.</span><span class="n">test_predetermined</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">max_lag</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>  <span class="c1"># [PG26] Remark 9 (experimental)</span>
+<span class="n">diagnostics</span><span class="o">.</span><span class="n">check_stationarity</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># ADF screening (warnings)</span>
+<span class="n">diagnostics</span><span class="o">.</span><span class="n">weight_diagnostics</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>  <span class="c1"># concentration of the FGLS weights</span></code></pre></div>
+<h3 id="benchmarks-bootstrap-simulation-designs"><a href="#benchmarks-bootstrap-simulation-designs">Benchmarks, bootstrap, simulation designs</a></h3>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="n">pf</span><span class="o">.</span><span class="n">benchmarks</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s2">"HAC"</span><span class="p">)</span>  <span class="c1"># Andrews QS kernel, automatic bandwidth</span>
+<span class="n">pf</span><span class="o">.</span><span class="n">benchmarks</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">cov_type</span><span class="o">=</span><span class="s2">"NW"</span><span class="p">)</span>  <span class="c1"># Newey–West</span>
+<span class="n">pf</span><span class="o">.</span><span class="n">benchmarks</span><span class="o">.</span><span class="n">cochrane_orcutt</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>  <span class="c1"># two-step CO (invalid if not exogenous)</span>
+<span class="n">pf</span><span class="o">.</span><span class="n">benchmarks</span><span class="o">.</span><span class="n">durbin</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>  <span class="c1"># beta^D from the Durbin regression</span>
+<span class="n">pf</span><span class="o">.</span><span class="n">benchmarks</span><span class="o">.</span><span class="n">infeasible_gls</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="p">[</span><span class="mf">0.8</span><span class="p">])</span>  <span class="c1"># known AR coefficients (or omega=)</span>
+<span class="n">pf</span><span class="o">.</span><span class="n">benchmarks</span><span class="o">.</span><span class="n">hybrid_gls</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>  <span class="c1"># [PG26] Suppl. S-1, exogenous only</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">SerialFGLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s2">"bootstrap"</span><span class="p">,</span> <span class="n">n_boot</span><span class="o">=</span><span class="mi">999</span><span class="p">,</span> <span class="n">boot_random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyfgls.simulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">serial_dgp</span><span class="p">,</span> <span class="n">hetero_dgp</span><span class="p">,</span> <span class="n">combined_dgp</span><span class="p">,</span> <span class="n">predictive_dgp</span></code></pre></div>
+<h3 id="scikit-learn"><a href="#scikit-learn">scikit-learn</a></h3>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">pyfgls.sklearn</span><span class="w"> </span><span class="kn">import</span> <span class="n">FGLSRegressor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">TimeSeriesSplit</span><span class="p">,</span> <span class="n">cross_val_score</span>
+
+<span class="n">cross_val_score</span><span class="p">(</span><span class="n">FGLSRegressor</span><span class="p">(</span><span class="n">hetero</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span> <span class="n">X_features</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">TimeSeriesSplit</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span></code></pre></div>
+<h3 id="reproducibility"><a href="#reproducibility">Reproducibility</a></h3>
+<p>Some steps of the estimators are random. Fix the seeds below and a fit gives the same
+numbers every time it is run.</p>
+<ul>
+<li>
+<p><strong>Serial correlation only</strong> (<code>SerialFGLS</code>, or <code>FGLS(..., hetero=None)</code>): the fit is
+deterministic. There is nothing to seed except the bootstrap.</p>
+</li>
+<li>
+<p><strong>Heteroskedasticity</strong> (<code>LassoFGLS</code>, <code>FGLS</code>): the cross-validation that tunes the
+adaptive Lasso (and SVR) splits the sample into random folds. Without a seed the
+selected covariates, and with them the estimates, can change from run to run. Pass
+<code>random_state=</code> (an int or a <code>numpy.random.Generator</code>) to the model:</p>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="n">res</span> <span class="o">=</span> <span class="n">pf</span><span class="o">.</span><span class="n">LassoFGLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span></code></pre></div>
+<p><code>fold_scheme=&quot;blocked&quot;</code> uses contiguous blocks instead of random folds and needs no
+seed.</p>
+</li>
+<li>
+<p><strong>Bootstrap</strong> (<code>fit(cov_type=&quot;bootstrap&quot;)</code>): pass <code>boot_random_state=</code>; by default it
+takes the model's <code>random_state</code>. Each replication draws from its own child seed
+(<code>numpy.random.SeedSequence.spawn</code>), so the result does not depend on <code>n_jobs</code>.</p>
+</li>
+<li>
+<p><strong>Simulated data</strong>: every design in <code>pyfgls.simulate</code> takes <code>random_state</code>.</p>
+</li>
+</ul>
+<p><code>n_jobs</code> only spreads the folds and the bootstrap replications over cores; with a fixed
+seed the results are the same for any value.</p>
+<p>When you report results, record the versions as well, since numerical libraries can change
+the last digits:</p>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sklearn</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyfgls</span>
+
+<span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="p">(</span><span class="n">pyfgls</span><span class="p">,</span> <span class="n">numpy</span><span class="p">,</span> <span class="n">scipy</span><span class="p">,</span> <span class="n">pandas</span><span class="p">,</span> <span class="n">sklearn</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">module</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span></code></pre></div>
+<h3 id="performance"><a href="#performance">Performance</a></h3>
+<p><code>python benchmarks/performance.py</code> (T = 10,000, 10 regressors, 100 candidate covariates,
+one core): serial FGLS ≈ 2 s, Lasso-FGLS ≈ 3 s, combined ≈ 5 s. <code>n_jobs</code> parallelises the
+cross-validation folds and the bootstrap.</p>
+</section>
+<section class="doc-section" aria-labelledby="theory">
+<h2 id="theory" class="doc-h2"><a href="#theory">Theory</a></h2>
+<h3 id="serial-correlation-pg26"><a href="#serial-correlation-pg26">Serial correlation ([PG26])</a></h3>
+<p>Model: <span class="math">\(y_t = x_t&#x27;\beta + u_t\)</span> with <span class="math">\(u_t = C(L)e_t\)</span> invertible, so that
+<span class="math">\(A(L)u_t = e_t\)</span> with <span class="math">\(A(L) = 1 - \sum_{j\ge1}\rho_j L^j\)</span> and <span class="math">\(e_t\)</span> a martingale
+difference sequence.</p>
+<h4 id="exogenous-versus-pre-determined-regressors"><a href="#exogenous-versus-pre-determined-regressors">Exogenous versus pre-determined regressors</a></h4>
+<p>The regressors are <em>pre-determined</em> when <span class="math">\(x_t\)</span> is uncorrelated with current and future
+innovations, and <em>exogenous</em> when, in addition, it is uncorrelated with past innovations.
+Many time-series regressors are only pre-determined: they react to past shocks.</p>
+<p>Under pre-determinedness alone, OLS is generally <strong>inconsistent</strong> — its error <span class="math">\(u_t\)</span>
+contains past innovations that are correlated with <span class="math">\(x_t\)</span>. GLS, which works with the
+innovations <span class="math">\(e_t\)</span> themselves, remains consistent. This reverses the usual advice that
+OLS is the &quot;robust&quot; choice ([PG26] Section 3).</p>
+<h4 id="estimating-the-filter"><a href="#estimating-the-filter">Estimating the filter</a></h4>
+<p>The feasible version needs an estimate of <span class="math">\(A(L)\)</span> that is itself consistent under
+pre-determinedness. Estimating it from OLS residuals (Cochrane–Orcutt) fails because the
+residuals inherit the OLS inconsistency. Instead [PG26] use the <strong>Durbin regression</strong>
+(eq. (14))</p>
+<div class="math">\[y_t = \sum_{j=1}^k \rho_j y_{t-j} + x_t&#x27;\beta - \sum_{j=1}^k x_{t-j}&#x27;\delta_j + e_{kt},\]</div>
+<p>whose regressors are all uncorrelated with <span class="math">\(e_t\)</span>. The order <span class="math">\(k\)</span> is chosen by BIC, with
+every candidate order estimated on the same sample <span class="math">\(t = k_{\max}+1,\dots,T\)</span> so that the
+criteria are comparable:</p>
+<div class="math">\[\mathrm{BIC}(k) = \ln\hat\sigma_k^2 + k\,\frac{\ln(T-k_{\max})}{T-k_{\max}},
+\qquad k = 0,\dots,k_{\max},\]</div>
+<p>with <span class="math">\(\hat\sigma_k^2\)</span> the mean squared residual of the order-<span class="math">\(k\)</span> Durbin regression. Lagged deterministic terms (constant, trends, seasonal dummies)
+are collinear with their contemporaneous values and are dropped automatically.</p>
+<h4 id="fgls-and-its-variance"><a href="#fgls-and-its-variance">FGLS and its variance</a></h4>
+<p>The data are quasi-differenced with <span class="math">\(\hat\rho_1,\dots,\hat\rho_{k^*}\)</span> and OLS is applied
+(eq. (15)):</p>
+<div class="math">\[\tilde y_t = y_t - \sum_{j=1}^{k^*}\hat\rho_j y_{t-j}, \qquad
+\tilde x_t = x_t - \sum_{j=1}^{k^*}\hat\rho_j x_{t-j}, \qquad
+\hat\beta = \Big(\sum_{t&gt;k^*}\tilde x_t\tilde x_t&#x27;\Big)^{-1}\sum_{t&gt;k^*}\tilde x_t\tilde y_t .\]</div>
+<p>Because the filter is estimated, the variance of <span class="math">\(\hat\beta\)</span> has two parts
+(Theorem 2): the usual GLS term and a correction for the first-stage estimation of
+<span class="math">\(\rho\)</span>, which involves <span class="math">\(g_j = E[\tilde x_t u_{t-j}]\)</span>. Under exogeneity <span class="math">\(g_j = 0\)</span> and the
+correction vanishes (the naive variance, eq. (27)); otherwise it does not, and the
+<strong>robust</strong> variance of eqs. (28)–(29) — the default in <code>pyfgls</code> — must be used. Its
+relative size is reported as <code>nonexogeneity_share</code>.</p>
+<h4 id="lagged-dependent-variables-2"><a href="#lagged-dependent-variables-2">Lagged dependent variables</a></h4>
+<p>If lags of <span class="math">\(y\)</span> are among the regressors, the coefficients on lagged <span class="math">\(y\)</span> in the Durbin
+regression no longer estimate <span class="math">\(\rho\)</span>. Declare them (<code>lagged_dep_vars=[...]</code>) and <code>pyfgls</code>
+recovers <span class="math">\(\rho_j\)</span> from the ratio of the coefficients of a lagged and a contemporaneous
+stochastic regressor (Wallis, 1967; [PG26] Section 4.2).</p>
+<h3 id="heteroskedasticity-of-unknown-form-gp24"><a href="#heteroskedasticity-of-unknown-form-gp24">Heteroskedasticity of unknown form ([GP24])</a></h3>
+<p>Model: <span class="math">\(y = X\beta + u\)</span>, <span class="math">\(E[u\mid X] = 0\)</span>, <span class="math">\(\operatorname{Var}(u_t) = v_t\)</span> with an unknown
+variance function.</p>
+<h4 id="estimating-the-skedastic-function"><a href="#estimating-the-skedastic-function">Estimating the skedastic function</a></h4>
+<p>GLS weights each observation by <span class="math">\(1/v_t\)</span>. [GP24] estimate <span class="math">\(\log v_t\)</span> by regressing
+<span class="math">\(\log\max(\hat u_t^2,\delta^2)\)</span> — the log of the squared OLS residuals, floored to avoid
+<span class="math">\(\log 0\)</span> — on a set of candidate covariates <span class="math">\(z_t\)</span> with an <strong>adaptive Lasso</strong>:</p>
+<ol>
+<li>a ridge regression gives preliminary coefficients;</li>
+<li>each candidate is penalised in inverse proportion to <span class="math">\(|\hat\gamma^{\text{ridge}}_j|^{\psi}\)</span>;</li>
+<li>the penalty level <span class="math">\(\lambda\)</span> and the exponent <span class="math">\(\psi\)</span> are chosen jointly by
+cross-validation.</li>
+</ol>
+<p>With <span class="math">\(\ell_t = \log\max(\hat u_t^2,\delta^2)\)</span>,</p>
+<div class="math">\[\hat\gamma = \arg\min_{\gamma_0,\gamma}\ \sum_t\big(\ell_t - \gamma_0 - z_t&#x27;\gamma\big)^2
++ \lambda\sum_j \frac{|\gamma_j|}{|\hat\gamma^{\text{ridge}}_j|^{\psi}},
+\qquad \hat v_t = \exp(\hat\gamma_0 + z_t&#x27;\hat\gamma),\]</div>
+<p>and the estimator is weighted least squares with weights <span class="math">\(1/\hat v_t\)</span>:
+<span class="math">\(\hat\beta = (X&#x27;\hat V^{-1}X)^{-1}X&#x27;\hat V^{-1}y\)</span> with <span class="math">\(\hat V = \operatorname{diag}(\hat v_t)\)</span>.</p>
+<p>The Lasso can handle many candidates, even more than observations, and selects a
+parsimonious model. If nothing is selected the weights are constant and FGLS reduces to
+OLS, so nothing is lost under homoskedasticity.</p>
+<h4 id="inference"><a href="#inference">Inference</a></h4>
+<p>Because the estimated variance function is only an approximation, <code>pyfgls</code> uses a
+heteroskedasticity-robust sandwich for the weighted estimator (eq. (6)), with a
+finite-sample bias correction that inflates the squared residuals by the leverage of
+the weighted regression and by the degrees of freedom of the skedastic fit (eq. (8)).
+The resulting intervals have close to nominal coverage and are much shorter than OLS
+intervals under heteroskedasticity.</p>
+<p>The parametric alternatives of Romano and Wolf (2017) (<code>&quot;wls_s1&quot;</code>, <code>&quot;wls_s2&quot;</code>) and a
+support-vector regression (<code>&quot;svr&quot;</code>) are also available.</p>
+<h3 id="both-problems-pg26-supplement-s-4"><a href="#both-problems-pg26-supplement-s-4">Both problems ([PG26] Supplement S-4)</a></h3>
+<p>With serially correlated errors whose innovations are heteroskedastic, the two
+corrections are applied in sequence:</p>
+<ol>
+<li><strong>F-C</strong>: the serial-correlation FGLS of [PG26];</li>
+<li>the adaptive-Lasso skedastic fit of [GP24] on the F-C residuals, with candidate
+covariates built from the <em>unfiltered</em> regressors;</li>
+<li><strong>F-CH</strong>: weighted least squares on the quasi-differenced data.</li>
+</ol>
+<p>The variance is the bias-corrected sandwich of [GP24] applied to the filtered regressors.
+<code>pyfgls</code> optionally adds a first-stage term for the estimated AR filter, the analogue of
+[PG26] eq. (29) for heteroskedastic innovations (<code>first_stage_correction</code>, on by default
+for pre-determined regressors). Under homoskedastic innovations F-CH is essentially
+equivalent to F-C.</p>
+<h3 id="implementation-choices-and-open-items"><a href="#implementation-choices-and-open-items">Implementation choices and open items</a></h3>
+<p>Where the papers leave room, <code>pyfgls</code> makes the following choices (all overridable):</p>
+<ul>
+<li><code>kmax = int(12·(T/200)^¼)</code>; the [PG26] simulations use 12 for T = 200 and 500.</li>
+<li>Variances are scaled by the effective sample <code>T − k*</code>; normal critical values unless
+<code>use_t=True</code>.</li>
+<li>The Lasso degrees of freedom count the intercept; the Romano–Wolf variance uses HC3
+OLS residuals (eq. 7).</li>
+<li>The ridge weights of the adaptive Lasso are re-estimated within each CV fold so the CV
+error is not flattered by weights that have seen the test fold (<code>cv_weights=&quot;full&quot;</code>
+computes them once).</li>
+<li>The Lasso path is computed exactly (LARS); coordinate descent did not converge on the
+highly correlated default dictionary.</li>
+<li>The first <code>k*</code> observations are dropped (no Prais–Winsten).</li>
+</ul>
+<p>Open items for the authors:</p>
+<ul>
+<li><strong>Combined variance.</strong> The Supplement does not write the first-stage term for F-CH;
+<code>pyfgls</code> adds a heteroskedasticity-robust analogue of eq. (29) by default (coverage
+0.94 with vs 0.78 without it for non-exogenous regressors).</li>
+<li><strong>Lag penalty with many regressors.</strong> The eq. (14) BIC penalises only the AR order; with
+several stochastic regressors it tends to select <code>kmax</code>. <code>ic_penalty=&quot;params&quot;</code> is
+available; the default follows the paper.</li>
+<li><strong>Small-sample Lasso efficiency.</strong> At T = 100–200 our Lasso-FGLS eMSE ratios are
+0.03–0.06 above [GP24] Table 1 (e.g. x²: 0.75–0.77 vs 0.70), although WLS-S1/S2, the
+infeasible GLS and the interval lengths agree with the paper and the T = 400 ratios
+match; the difference must come from details of the glmnet-based tuning.</li>
+<li><strong>Multi-regressor Wallis ratio</strong> (<code>wallis_regressor</code>): <code>&quot;auto&quot;</code> uses the regressor with the
+largest |t|; [PG26] reports insensitivity to the choice.</li>
+<li><strong>Remark 9 test.</strong> Read literally (n·R² of the Durbin residuals on X and lagged x), the
+test rejects correctly specified models whose regressors are pre-determined but not
+exogenous, because the Durbin residuals are not orthogonal to X and still contain past
+innovations. <code>test_predetermined</code> therefore uses the variable-addition form
+n(SSR₀ − SSR₁)/SSR₀ on the innovation scale (residuals and regressors filtered with the
+Durbin AR filter); simulated size 0.04, power 1.00 against an omitted x_{t−1}.
+<code>scale=&quot;errors&quot;</code> keeps the literal reading.</li>
+<li><strong>GMA.</strong> θ̂ is the exact Gaussian MLE from the residuals of the Durbin regression with
+k_T = int(4(T/100)^{2/9}) lags (§5), and all T observations are transformed.</li>
+</ul>
+</section>
+<section class="doc-section" aria-labelledby="api">
+<h2 id="api" class="doc-h2"><a href="#api">API reference</a></h2>
+<p class="api-note">Generated from the docstrings of pyfgls 0.1.0.</p>
+<h3 id="api-estimators"><a href="#api-estimators">Estimators</a></h3>
+<div class="api-obj api-class">
+<h4 id="pyfgls-FGLS" class="api-h"><a href="#pyfgls-FGLS"><code>pyfgls.FGLS</code></a> <span class="api-kind">class</span></h4>
+<div class="code sig"><pre><code>pyfgls.FGLS(
+    y,
+    X,
+    *,
+    serial='auto',
+    hetero='lasso',
+    z='auto',
+    ar_order=None,
+    ic='bic',
+    kmax=None,
+    min_lags=None,
+    ic_penalty='order',
+    lagged_dep_vars=None,
+    wallis_regressor='auto',
+    exog='predetermined',
+    first_stage_correction=None,
+    variance=None,
+    delta=0.1,
+    delta_scale=False,
+    cv_folds=10,
+    psi_grid=PSI_GRID,
+    lambda_rule='min',
+    fold_scheme='random',
+    cv_weights='fold',
+    weight_clip=None,
+    transforms=('linear', 'poly2', 'log', 'trig'),
+    random_state=None,
+    n_jobs=None,
+    missing='raise',
+    allow_gaps=False,
+    check_stationarity=False,
+)</code></pre></div>
+<p>Feasible GLS for serial correlation and/or heteroskedasticity.</p>
+<p><code>FGLS(y, X)</code> corrects for both problems: the AR filter of [PG26] (Durbin
+regression, BIC lag selection, quasi-differencing) followed by the adaptive-Lasso
+skedastic weights of [GP24] estimated on the filtered residuals ([PG26] Supplement
+S-4, the &quot;F-CH&quot; estimator). <code>serial=None</code> gives the pure [GP24] estimator and
+<code>hetero=None</code> the pure [PG26] estimator.</p>
+<p class="api-label">parameters</p>
+<dl class="api-items">
+<dt><code>y</code> <span class="api-type">array_like or pandas.Series</span></dt>
+<dd><p>Dependent variable (time ordered unless <code>serial=None</code>).</p>
+</dd>
+<dt><code>X</code> <span class="api-type">array_like or pandas.DataFrame</span></dt>
+<dd><p>Regressors, including a constant column for an intercept.</p>
+</dd>
+<dt><code>serial</code> <span class="api-type">(&#x27;auto&#x27;, &#x27;fixed&#x27;, &#x27;ma1&#x27;, None)</span></dt>
+<dd><p><code>&quot;auto&quot;</code> (default): AR order by BIC; <code>&quot;fixed&quot;</code>: use <code>ar_order</code>;
+<code>&quot;ma1&quot;</code>: GMA estimator for MA(1) errors ([PG26] Section 5); <code>None</code>: no
+serial-correlation correction.</p>
+</dd>
+<dt><code>hetero</code> <span class="api-type">(&#x27;lasso&#x27;, &#x27;svr&#x27;, &#x27;wls_s1&#x27;, &#x27;wls_s2&#x27;, &#x27;known&#x27;, None)</span></dt>
+<dd><p>Skedastic-function estimator ([GP24]); <code>None</code>: no heteroskedasticity
+correction.</p>
+</dd>
+<dt><code>z</code> <span class="api-type">&quot;auto&quot;, list of regressor names, or array/DataFrame</span></dt>
+<dd><p>Candidate covariates of the skedastic function (unfiltered). <code>&quot;auto&quot;</code> builds
+<code>{x, x^2, log x, (log x)^2, cos x, cos 2x}</code> from each non-constant regressor.</p>
+</dd>
+<dt><code>ar_order</code>, <code>ic</code>, <code>kmax</code>, <code>min_lags</code>, <code>ic_penalty</code>, <code>lagged_dep_vars</code>, <code>wallis_regressor</code></dt>
+<dd><p>Serial-correlation options; see <a href="#pyfgls-SerialFGLS"><code>SerialFGLS</code></a>.</p>
+</dd>
+<dt><code>exog</code> <span class="api-type">(&#x27;predetermined&#x27;, &#x27;exogenous&#x27;)</span></dt>
+<dd><p>Assumption on the regressors. Controls the default of
+<code>first_stage_correction</code> and the diagnostic notes; estimates are unaffected.</p>
+</dd>
+<dt><code>first_stage_correction</code> <span class="api-type">bool</span></dt>
+<dd><p>Add the [PG26] eq. (29)-type first-stage term to the combined variance
+(default: <code>True</code> if <code>exog=&quot;predetermined&quot;</code>). See <code>pyfgls.combined</code>.</p>
+</dd>
+<dt><code>variance</code> <span class="api-type">array or callable</span></dt>
+<dd><p>Known variances for <code>hetero=&quot;known&quot;</code>.</p>
+</dd>
+<dt><code>delta</code>, <code>delta_scale</code>, <code>cv_folds</code>, <code>psi_grid</code>, <code>lambda_rule</code>, <code>fold_scheme</code>, <code>cv_weights</code>, <code>weight_clip</code>, <code>transforms</code></dt>
+<dd><p>Heteroskedasticity options; see <a href="#pyfgls-LassoFGLS"><code>LassoFGLS</code></a>.</p>
+</dd>
+<dt><code>random_state</code> <span class="api-type">int or Generator</span></dt>
+<dd><p>Seeds the cross-validation folds (and, unless overridden in <code>fit</code>, the
+bootstrap).</p>
+</dd>
+<dt><code>n_jobs</code> <span class="api-type">int</span></dt>
+<dd><p>Parallel jobs (cross-validation, bootstrap).</p>
+</dd>
+<dt><code>missing</code> <span class="api-type">(&#x27;raise&#x27;, &#x27;drop&#x27;)</span></dt>
+<dd></dd>
+<dt><code>allow_gaps</code> <span class="api-type">bool</span></dt>
+<dd><p>Accept a time index with gaps (lags are then positional).</p>
+</dd>
+<dt><code>check_stationarity</code> <span class="api-type">bool</span></dt>
+<dd><p>Screen <code>y</code> and the regressors with ADF tests and warn
+(<a href="#pyfgls-exceptions-NonStationaryWarning"><code>NonStationaryWarning</code></a>) when a unit root is not
+rejected. Off by default.</p>
+</dd>
+</dl>
+<p class="api-label">examples</p>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pyfgls.simulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">combined_dgp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sim</span> <span class="o">=</span> <span class="n">combined_dgp</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="n">ar</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,),</span> <span class="n">skedastic</span><span class="o">=</span><span class="s2">"x2"</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">FGLS</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span><span class="o">.</span><span class="n">method</span>
+<span class="go">'F-CH (serial+hetero)'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span><span class="o">.</span><span class="n">ar_order</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">compare_stages</span><span class="p">()</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="go">['F-C (serial)', 'F-CH (serial+hetero)']</span></code></pre></div>
+<div class="api-obj api-classmethod">
+<h5 id="pyfgls-FGLS-from_formula" class="api-h"><a href="#pyfgls-FGLS-from_formula"><code>from_formula</code></a> <span class="api-kind">classmethod</span></h5>
+<div class="code sig"><pre><code>from_formula(formula, data, **kwargs)</code></pre></div>
+<p>Build the model from a formula such as <code>&quot;y ~ x1 + np.log(x2) + lag(x1)&quot;</code>.</p>
+<p>Requires the <code>formula</code> extra (formulaic). Missing values created by
+<code>lag()</code> are left in place, so pass <code>missing=&quot;drop&quot;</code> to drop the leading
+rows. The intercept column is named <code>const</code>. Other keyword arguments go to
+the class constructor.</p>
+<p class="api-label">examples</p>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pyfgls.simulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">serial_dgp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sim</span> <span class="o">=</span> <span class="n">serial_dgp</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">"y"</span><span class="p">:</span> <span class="n">sim</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="s2">"x"</span><span class="p">:</span> <span class="n">sim</span><span class="o">.</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SerialFGLS</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">"y ~ x"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="go">['const', 'x']</span></code></pre></div>
+</div>
+<div class="api-obj api-method">
+<h5 id="pyfgls-FGLS-fit" class="api-h"><a href="#pyfgls-FGLS-fit"><code>fit</code></a> <span class="api-kind">method</span></h5>
+<div class="code sig"><pre><code>fit(
+    cov_type='robust',
+    *,
+    use_t=False,
+    n_boot=999,
+    bootstrap='wild',
+    wild_dist='rademacher',
+    boot_random_state=None,
+)</code></pre></div>
+<p>Estimate the model.</p>
+<p class="api-label">parameters</p>
+<dl class="api-items">
+<dt><code>cov_type</code> <span class="api-type">str</span></dt>
+<dd><p><code>&quot;robust&quot;</code> (default): [PG26] eq. (29) for serial correlation, [GP24]
+eq. (8)/(7) for heteroskedasticity, [PG26] Supplement (A.4)–(A.5) for
+both. Also <code>&quot;naive&quot;</code> and <code>&quot;HC0&quot;</code>–<code>&quot;HC3&quot;</code> (serial), <code>&quot;nonrobust&quot;</code>
+and <code>&quot;HC0&quot;</code>–<code>&quot;HC3&quot;</code> (heteroskedasticity), <code>&quot;HC0&quot;</code>/<code>&quot;HC3&quot;</code>
+(combined), and <code>&quot;bootstrap&quot;</code> (all).</p>
+</dd>
+<dt><code>use_t</code> <span class="api-type">bool</span></dt>
+<dd><p>Student-t inference with <code>n_eff - q</code> degrees of freedom.</p>
+</dd>
+<dt><code>n_boot</code> <span class="api-type">int</span></dt>
+<dd><p>Bootstrap replications (<code>cov_type=&quot;bootstrap&quot;</code>).</p>
+</dd>
+<dt><code>bootstrap</code> <span class="api-type">(&#x27;wild&#x27;, &#x27;iid&#x27;)</span></dt>
+<dd><p>Innovation scheme of the sieve bootstrap (serial models).</p>
+</dd>
+<dt><code>wild_dist</code> <span class="api-type">(&#x27;rademacher&#x27;, &#x27;mammen&#x27;)</span></dt>
+<dd><p>Wild-bootstrap multipliers.</p>
+</dd>
+<dt><code>boot_random_state</code> <span class="api-type">int or Generator</span></dt>
+<dd><p>Seed of the bootstrap (default: <code>random_state</code> of the model).</p>
+</dd>
+</dl>
+<p class="api-label">returns</p>
+<dl class="api-items">
+<dt><span class="api-type">FGLSResults</span></dt>
+<dd></dd>
+</dl>
+</div>
+</div>
+<div class="api-obj api-class">
+<h4 id="pyfgls-SerialFGLS" class="api-h"><a href="#pyfgls-SerialFGLS"><code>pyfgls.SerialFGLS</code></a> <span class="api-kind">class</span></h4>
+<div class="code sig"><pre><code>pyfgls.SerialFGLS(
+    y,
+    X,
+    *,
+    ar_order=None,
+    ic='bic',
+    kmax=None,
+    min_lags=None,
+    ic_penalty='order',
+    lagged_dep_vars=None,
+    wallis_regressor='auto',
+    exog='predetermined',
+    ma1=False,
+    missing='raise',
+    allow_gaps=False,
+    check_stationarity=False,
+)</code></pre></div>
+<p>Feasible GLS for regressions with serially correlated errors ([PG26]).</p>
+<p>The errors are approximated by an AR(k) process whose order is selected by BIC and
+whose coefficients come from the Durbin regression ([PG26] eq. (14)); the data are
+quasi-differenced and OLS is applied ([PG26] eq. (15)). The default variance
+(<code>cov_type=&quot;robust&quot;</code>) is the exogeneity-robust estimator of [PG26] eqs.
+(28)–(29), valid when the regressors are only pre-determined.</p>
+<p class="api-label">parameters</p>
+<dl class="api-items">
+<dt><code>y</code> <span class="api-type">array_like or pandas.Series</span></dt>
+<dd><p>Dependent variable (time ordered).</p>
+</dd>
+<dt><code>X</code> <span class="api-type">array_like or pandas.DataFrame</span></dt>
+<dd><p>Regressors, including a constant column for an intercept.</p>
+</dd>
+<dt><code>ar_order</code> <span class="api-type">int</span></dt>
+<dd><p>Fix the AR order instead of selecting it.</p>
+</dd>
+<dt><code>ic</code> <span class="api-type">(&#x27;bic&#x27;, &#x27;aic&#x27;)</span></dt>
+<dd><p>Information criterion for the order selection (default BIC, as in [PG26]).</p>
+</dd>
+<dt><code>kmax</code> <span class="api-type">(int, &#x27;default&#x27; or &#x27;theory&#x27;)</span></dt>
+<dd><p>Largest order considered. Default <code>int(12 * (T/200)**0.25)</code> (12 at
+<code>T = 200</code>, as in the [PG26] simulations); <code>&quot;theory&quot;</code> gives
+<code>floor((T/ln T)**(1/3))</code>. Capped so the Durbin regression uses at most half
+the sample as regressors.</p>
+</dd>
+<dt><code>min_lags</code> <span class="api-type">int or &#x27;adjusted&#x27;</span></dt>
+<dd><p>Lower bound on the order; <code>&quot;adjusted&quot;</code> uses <code>ceil((ln T)**1.5)</code>
+([PG26] Suppl. Lemma A.2). Default <code>None</code>.</p>
+</dd>
+<dt><code>ic_penalty</code> <span class="api-type">(&#x27;order&#x27;, &#x27;params&#x27;)</span></dt>
+<dd><p><code>&quot;order&quot;</code> (default, as in [PG26] eq. (14)) penalises the AR order;
+<code>&quot;params&quot;</code> penalises every coefficient a lag adds to the Durbin regression
+(<code>1 + m</code> for <code>m</code> stochastic regressors). Use <code>&quot;params&quot;</code> with several
+regressors: the order-based criterion then tends to select <code>kmax</code>.</p>
+</dd>
+<dt><code>lagged_dep_vars</code> <span class="api-type">list of str or int</span></dt>
+<dd><p>Regressors that are lags of <code>y</code>. The AR coefficients are then recovered by the
+Wallis ratio ([PG26] Section 4.2).</p>
+</dd>
+<dt><code>wallis_regressor</code> <span class="api-type">(&#x27;auto&#x27;, &#x27;median&#x27;)</span></dt>
+<dd><p>Regressor used for the Wallis ratio (see <code>pyfgls.serial.wallis</code>).</p>
+</dd>
+<dt><code>exog</code> <span class="api-type">(&#x27;predetermined&#x27;, &#x27;exogenous&#x27;)</span></dt>
+<dd><p>Your assumption about the regressors. It does not change the estimates (the
+robust variance is valid under both); with <code>&quot;exogenous&quot;</code> a note is added when
+the data suggest otherwise.</p>
+</dd>
+<dt><code>ma1</code> <span class="api-type">bool</span></dt>
+<dd><p>Use the GMA estimator for MA(1) errors ([PG26] Section 5) instead of the AR
+filter — for errors known to be MA(1), e.g. two-step-ahead forecast errors.</p>
+</dd>
+<dt><code>missing</code> <span class="api-type">(&#x27;raise&#x27;, &#x27;drop&#x27;)</span></dt>
+<dd><p>Missing-value policy (only leading/trailing rows can be dropped).</p>
+</dd>
+<dt><code>allow_gaps</code> <span class="api-type">bool</span></dt>
+<dd><p>Accept a date index with gaps (lags are then positional).</p>
+</dd>
+<dt><code>check_stationarity</code> <span class="api-type">bool</span></dt>
+<dd><p>ADF screening of <code>y</code> and the regressors (warnings only).</p>
+</dd>
+</dl>
+<p class="api-label">examples</p>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pyfgls.simulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">serial_dgp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sim</span> <span class="o">=</span> <span class="n">serial_dgp</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">SerialFGLS</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span><span class="o">.</span><span class="n">ar_order</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">"x1"</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">1.0</span></code></pre></div>
+<p class="api-inherits">Inherits <a href="#pyfgls-FGLS-from_formula"><code>from_formula()</code></a>, <a href="#pyfgls-FGLS-fit"><code>fit()</code></a> from <a href="#pyfgls-FGLS"><code>FGLS</code></a>.</p>
+</div>
+<div class="api-obj api-class">
+<h4 id="pyfgls-LassoFGLS" class="api-h"><a href="#pyfgls-LassoFGLS"><code>pyfgls.LassoFGLS</code></a> <span class="api-kind">class</span></h4>
+<div class="code sig"><pre><code>pyfgls.LassoFGLS(
+    y,
+    X,
+    *,
+    z='auto',
+    skedastic='lasso',
+    variance=None,
+    delta=0.1,
+    delta_scale=False,
+    cv_folds=10,
+    psi_grid=PSI_GRID,
+    lambda_rule='min',
+    fold_scheme='random',
+    cv_weights='fold',
+    weight_clip=None,
+    transforms=('linear', 'poly2', 'log', 'trig'),
+    random_state=None,
+    n_jobs=None,
+    missing='raise',
+)</code></pre></div>
+<p>Feasible GLS under heteroskedasticity of unknown form ([GP24]).</p>
+<p>The log of the squared OLS residuals is regressed on candidate covariates <code>z</code>
+by an adaptive Lasso tuned by cross-validation; the exponentiated fit gives the
+weights of a weighted least-squares regression. Inference uses the sandwich of
+[GP24] eq. (6) with the bias correction of eq. (8), so it remains valid when the
+skedastic model is misspecified.</p>
+<p class="api-label">parameters</p>
+<dl class="api-items">
+<dt><code>y</code> <span class="api-type">array_like or pandas.Series</span></dt>
+<dd></dd>
+<dt><code>X</code> <span class="api-type">array_like or pandas.DataFrame</span></dt>
+<dd><p>Regressors, including a constant column for an intercept.</p>
+</dd>
+<dt><code>z</code> <span class="api-type">&quot;auto&quot;, list of regressor names, or array/DataFrame</span></dt>
+<dd><p>Candidate covariates. <code>&quot;auto&quot;</code> (default) builds
+<code>{x, x^2, log x, (log x)^2, cos x, cos 2x}</code> from every non-constant regressor
+(logs only for positive regressors; dummies untransformed).</p>
+</dd>
+<dt><code>skedastic</code> <span class="api-type">(&#x27;lasso&#x27;, &#x27;svr&#x27;, &#x27;wls_s1&#x27;, &#x27;wls_s2&#x27;, &#x27;none&#x27;, &#x27;known&#x27;)</span></dt>
+<dd><p>Skedastic-function estimator. <code>&quot;lasso&quot;</code> (default) is the adaptive Lasso of
+[GP24]; <code>&quot;svr&quot;</code> support-vector regression; <code>&quot;wls_s1&quot;</code>/<code>&quot;wls_s2&quot;</code> the
+Romano–Wolf (2017) parametric fits; <code>&quot;none&quot;</code> OLS; <code>&quot;known&quot;</code> (or an array /
+callable of <code>X</code>) uses the given variances (infeasible GLS benchmark).</p>
+</dd>
+<dt><code>variance</code> <span class="api-type">array or callable</span></dt>
+<dd><p>Known variances for <code>skedastic=&quot;known&quot;</code>.</p>
+</dd>
+<dt><code>delta</code> <span class="api-type">float</span></dt>
+<dd><p>Floor in <code>log(max(u^2, delta^2))</code> (default 0.1, in the units of <code>y</code>).</p>
+</dd>
+<dt><code>delta_scale</code> <span class="api-type">bool</span></dt>
+<dd><p>Use the scale-aware floor <code>delta * sigma_OLS</code>.</p>
+</dd>
+<dt><code>cv_folds</code>, <code>psi_grid</code>, <code>lambda_rule</code>, <code>fold_scheme</code>, <code>cv_weights</code></dt>
+<dd><p>Adaptive-Lasso tuning; see <code>pyfgls.hetero.adaptive_lasso.adaptive_lasso()</code>.</p>
+</dd>
+<dt><code>weight_clip</code> <span class="api-type">(lo, hi)</span></dt>
+<dd><p>Quantile winsorisation of the fitted log-variance (default none).</p>
+</dd>
+<dt><code>transforms</code> <span class="api-type">sequence of str</span></dt>
+<dd><p>Transform families for <code>z=&quot;auto&quot;</code>.</p>
+</dd>
+<dt><code>random_state</code> <span class="api-type">int or Generator</span></dt>
+<dd><p>Seeds the cross-validation folds.</p>
+</dd>
+<dt><code>n_jobs</code> <span class="api-type">int</span></dt>
+<dd><p>Parallel jobs for cross-validation.</p>
+</dd>
+<dt><code>missing</code> <span class="api-type">(&#x27;raise&#x27;, &#x27;drop&#x27;)</span></dt>
+<dd><p>Missing-value policy (rows with missing values are dropped jointly in <code>y</code>,
+<code>X</code> and a user-supplied <code>z</code>).</p>
+</dd>
+</dl>
+<p class="api-label">examples</p>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pyfgls.simulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">hetero_dgp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sim</span> <span class="o">=</span> <span class="n">hetero_dgp</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="n">skedastic</span><span class="o">=</span><span class="s2">"x2"</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">LassoFGLS</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span><span class="o">.</span><span class="n">hetero</span><span class="o">.</span><span class="n">skedastic</span>
+<span class="go">'lasso'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ols</span> <span class="o">=</span> <span class="n">LassoFGLS</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">skedastic</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">bool</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">bse</span><span class="p">[</span><span class="s2">"x1"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">ols</span><span class="o">.</span><span class="n">bse</span><span class="p">[</span><span class="s2">"x1"</span><span class="p">])</span>
+<span class="go">True</span></code></pre></div>
+<p class="api-inherits">Inherits <a href="#pyfgls-FGLS-from_formula"><code>from_formula()</code></a>, <a href="#pyfgls-FGLS-fit"><code>fit()</code></a> from <a href="#pyfgls-FGLS"><code>FGLS</code></a>.</p>
+</div>
+<h3 id="api-results"><a href="#api-results">Results</a></h3>
+<div class="api-obj api-dataclass">
+<h4 id="pyfgls-results-FGLSResults" class="api-h"><a href="#pyfgls-results-FGLSResults"><code>pyfgls.results.FGLSResults</code></a> <span class="api-kind">dataclass</span></h4>
+<div class="code sig"><pre><code>pyfgls.results.FGLSResults(
+    params,
+    cov,
+    method,
+    cov_type,
+    nobs,
+    n_eff,
+    use_t,
+    resid,
+    resid_final,
+    data,
+    serial=None,
+    hetero=None,
+    stages=dict(),
+    options=dict(),
+    notes=(),
+)</code></pre></div>
+<p>Results of an FGLS (or OLS benchmark) fit.</p>
+<p>Most users access the statsmodels-like attributes <code>params</code>, <code>bse</code>,
+<code>tvalues</code>, <code>pvalues</code>, <code>conf_int()</code>, <code>cov_params()</code> and <code>summary()</code>.
+Arrays are returned as pandas objects labelled by the regressor names.</p>
+<p class="api-label">attributes</p>
+<dl class="api-items">
+<dt><code>params</code> <span class="api-type">pandas.Series</span></dt>
+<dd><p>Estimated coefficients.</p>
+</dd>
+<dt><code>cov</code> <span class="api-type">pandas.DataFrame</span></dt>
+<dd><p>Estimated covariance matrix of <code>params</code>.</p>
+</dd>
+<dt><code>method</code> <span class="api-type">str</span></dt>
+<dd><p>Human-readable estimator name.</p>
+</dd>
+<dt><code>cov_type</code> <span class="api-type">str</span></dt>
+<dd><p>Variance estimator.</p>
+</dd>
+<dt><code>nobs</code> <span class="api-type">int</span></dt>
+<dd><p>Number of observations <code>T</code>.</p>
+</dd>
+<dt><code>n_eff</code> <span class="api-type">int</span></dt>
+<dd><p>Effective number of observations in the final regression (<code>T - k*</code>).</p>
+</dd>
+<dt><code>use_t</code> <span class="api-type">bool</span></dt>
+<dd><p>Whether inference uses Student-t (<code>n_eff - q</code> dof) instead of the normal.</p>
+</dd>
+<dt><code>resid</code> <span class="api-type">pandas.Series</span></dt>
+<dd><p>Residuals <code>y_t - x_t' beta</code> on the full sample.</p>
+</dd>
+<dt><code>resid_final</code> <span class="api-type">pandas.Series</span></dt>
+<dd><p>Residuals of the final (filtered and/or weighted) regression on the effective
+sample — the estimated innovations.</p>
+</dd>
+<dt><code>serial</code> <span class="api-type">SerialInfo or None</span></dt>
+<dd></dd>
+<dt><code>hetero</code> <span class="api-type">HeteroInfo or None</span></dt>
+<dd></dd>
+<dt><code>stages</code> <span class="api-type">dict</span></dt>
+<dd><p>Intermediate estimators (e.g. <code>&quot;serial&quot;</code> = F-C and <code>&quot;hetero&quot;</code> = F-CH).</p>
+</dd>
+<dt><code>options</code> <span class="api-type">dict</span></dt>
+<dd><p>Options used for the fit.</p>
+</dd>
+</dl>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-k_vars" class="api-h"><a href="#pyfgls-results-FGLSResults-k_vars"><code>k_vars</code></a> <span class="api-kind">property</span></h5>
+<p>Number of coefficients <code>q</code>.</p>
+</div>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-df_resid" class="api-h"><a href="#pyfgls-results-FGLSResults-df_resid"><code>df_resid</code></a> <span class="api-kind">property</span></h5>
+<p>Residual degrees of freedom <code>n_eff - q</code> (used when <code>use_t</code>).</p>
+</div>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-bse" class="api-h"><a href="#pyfgls-results-FGLSResults-bse"><code>bse</code></a> <span class="api-kind">property</span></h5>
+<p>Standard errors.</p>
+</div>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-tvalues" class="api-h"><a href="#pyfgls-results-FGLSResults-tvalues"><code>tvalues</code></a> <span class="api-kind">property</span></h5>
+<p>T (or z) statistics <code>params / bse</code>.</p>
+</div>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-pvalues" class="api-h"><a href="#pyfgls-results-FGLSResults-pvalues"><code>pvalues</code></a> <span class="api-kind">property</span></h5>
+<p>Two-sided p-values (normal by default, Student-t if <code>use_t</code>).</p>
+</div>
+<div class="api-obj api-method">
+<h5 id="pyfgls-results-FGLSResults-conf_int" class="api-h"><a href="#pyfgls-results-FGLSResults-conf_int"><code>conf_int</code></a> <span class="api-kind">method</span></h5>
+<div class="code sig"><pre><code>conf_int(alpha=0.05)</code></pre></div>
+<p>Wald confidence intervals <code>params -/+ c_{1-alpha/2} * bse</code>.</p>
+</div>
+<div class="api-obj api-method">
+<h5 id="pyfgls-results-FGLSResults-cov_params" class="api-h"><a href="#pyfgls-results-FGLSResults-cov_params"><code>cov_params</code></a> <span class="api-kind">method</span></h5>
+<div class="code sig"><pre><code>cov_params()</code></pre></div>
+<p>Estimated covariance matrix of the coefficients.</p>
+</div>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-fittedvalues" class="api-h"><a href="#pyfgls-results-FGLSResults-fittedvalues"><code>fittedvalues</code></a> <span class="api-kind">property</span></h5>
+<p>Fitted values <code>x_t' beta</code> on the full sample.</p>
+</div>
+<div class="api-obj api-method">
+<h5 id="pyfgls-results-FGLSResults-predict" class="api-h"><a href="#pyfgls-results-FGLSResults-predict"><code>predict</code></a> <span class="api-kind">method</span></h5>
+<div class="code sig"><pre><code>predict(X_new=None)</code></pre></div>
+<p>Predict <code>x' beta</code> for new regressors (in-sample fitted values if <code>None</code>).</p>
+<p><code>X_new</code> must have the same columns as the estimation <code>X</code> (same order, or
+the same names for a DataFrame). Returns a Series for pandas input.</p>
+</div>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-ar_order" class="api-h"><a href="#pyfgls-results-FGLSResults-ar_order"><code>ar_order</code></a> <span class="api-kind">property</span></h5>
+<p>Selected AR order <code>k*</code> (<code>None</code> without serial correction).</p>
+</div>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-rho" class="api-h"><a href="#pyfgls-results-FGLSResults-rho"><code>rho</code></a> <span class="api-kind">property</span></h5>
+<p>Estimated AR coefficients (<code>None</code> without serial correction).</p>
+</div>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-ar_roots" class="api-h"><a href="#pyfgls-results-FGLSResults-ar_roots"><code>ar_roots</code></a> <span class="api-kind">property</span></h5>
+<p>Roots of the estimated AR polynomial.</p>
+</div>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-bic_path" class="api-h"><a href="#pyfgls-results-FGLSResults-bic_path"><code>bic_path</code></a> <span class="api-kind">property</span></h5>
+<p>Information criterion by AR order (<code>None</code> if the order was fixed).</p>
+</div>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-nonexogeneity_share" class="api-h"><a href="#pyfgls-results-FGLSResults-nonexogeneity_share"><code>nonexogeneity_share</code></a> <span class="api-kind">property</span></h5>
+<p>Size of the [PG26] eq. (29) correction relative to the naive variance.</p>
+<p>Average over coefficients of <code>(AVar_R - AVar_N)_ii / (AVar_N)_ii</code>. Values
+near zero mean the regressors behave as exogenous; large values mean the naive
+variance (eq. (27)) would understate the uncertainty.</p>
+</div>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-skedastic_coef" class="api-h"><a href="#pyfgls-results-FGLSResults-skedastic_coef"><code>skedastic_coef</code></a> <span class="api-kind">property</span></h5>
+<p>Coefficients of the fitted log-variance function.</p>
+</div>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-selected_z" class="api-h"><a href="#pyfgls-results-FGLSResults-selected_z"><code>selected_z</code></a> <span class="api-kind">property</span></h5>
+<p>Candidate covariates selected by the skedastic fit.</p>
+</div>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-weights" class="api-h"><a href="#pyfgls-results-FGLSResults-weights"><code>weights</code></a> <span class="api-kind">property</span></h5>
+<p>FGLS weights <code>1/v_t</code> (<code>None</code> without heteroskedasticity correction).</p>
+</div>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-df_hat" class="api-h"><a href="#pyfgls-results-FGLSResults-df_hat"><code>df_hat</code></a> <span class="api-kind">property</span></h5>
+<p>Degrees of freedom of the skedastic fit (bias correction, [GP24] eq. (8)).</p>
+</div>
+<div class="api-obj api-method">
+<h5 id="pyfgls-results-FGLSResults-wald_test" class="api-h"><a href="#pyfgls-results-FGLSResults-wald_test"><code>wald_test</code></a> <span class="api-kind">method</span></h5>
+<div class="code sig"><pre><code>wald_test(restrictions, value=None)</code></pre></div>
+<p>Wald test of linear restrictions <code>R beta = r</code>.</p>
+<p class="api-label">parameters</p>
+<dl class="api-items">
+<dt><code>restrictions</code> <span class="api-type">str, list of str, (R, r) or R</span></dt>
+<dd><p>Restrictions as strings such as <code>&quot;x1 = x2&quot;</code>, <code>&quot;x1 + 2*x2 = 1&quot;</code> or
+<code>&quot;x1 = 0, x2 = 0&quot;</code>; or a matrix <code>R</code> (with <code>value</code> = <code>r</code>, default 0).</p>
+</dd>
+<dt><code>value</code> <span class="api-type">array_like</span></dt>
+<dd><p>Right-hand side <code>r</code> when <code>restrictions</code> is a matrix.</p>
+</dd>
+</dl>
+<p class="api-label">returns</p>
+<dl class="api-items">
+<dt><span class="api-type">WaldTestResult</span></dt>
+<dd><p>Chi-square test (<code>F = chi2 / m</code> with <code>(m, n_eff - q)</code> dof if <code>use_t</code>).</p>
+</dd>
+</dl>
+</div>
+<div class="api-obj api-method">
+<h5 id="pyfgls-results-FGLSResults-compare_ols" class="api-h"><a href="#pyfgls-results-FGLSResults-compare_ols"><code>compare_ols</code></a> <span class="api-kind">method</span></h5>
+<div class="code sig"><pre><code>compare_ols(*, cov_type=None, alpha=0.05)</code></pre></div>
+<p>Side-by-side table of this fit and OLS on the same data.</p>
+<p>The OLS standard errors are HAC (Andrews quadratic-spectral kernel, automatic
+bandwidth) for fits that correct serial correlation and HC3 otherwise; pass
+<code>cov_type</code> (<code>&quot;HAC&quot;</code>, <code>&quot;NW&quot;</code>, <code>&quot;HC0&quot;</code>..<code>&quot;HC3&quot;</code>) to override.</p>
+</div>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-stage_serial" class="api-h"><a href="#pyfgls-results-FGLSResults-stage_serial"><code>stage_serial</code></a> <span class="api-kind">property</span></h5>
+<p>The serial-correlation-only stage (F-C) of a combined fit.</p>
+</div>
+<div class="api-obj api-property">
+<h5 id="pyfgls-results-FGLSResults-stage_hetero" class="api-h"><a href="#pyfgls-results-FGLSResults-stage_hetero"><code>stage_hetero</code></a> <span class="api-kind">property</span></h5>
+<p>The fully corrected stage (F-CH) of a combined fit: this result.</p>
+</div>
+<div class="api-obj api-method">
+<h5 id="pyfgls-results-FGLSResults-compare_stages" class="api-h"><a href="#pyfgls-results-FGLSResults-compare_stages"><code>compare_stages</code></a> <span class="api-kind">method</span></h5>
+<div class="code sig"><pre><code>compare_stages(alpha=0.05)</code></pre></div>
+<p>Compare the intermediate estimators (e.g. F-C vs F-CH) with this fit.</p>
+</div>
+<div class="api-obj api-method">
+<h5 id="pyfgls-results-FGLSResults-to_frame" class="api-h"><a href="#pyfgls-results-FGLSResults-to_frame"><code>to_frame</code></a> <span class="api-kind">method</span></h5>
+<div class="code sig"><pre><code>to_frame(alpha=0.05)</code></pre></div>
+<p>Coefficient table as a DataFrame (coef, std err, t/z, p-value, CI).</p>
+</div>
+<div class="api-obj api-method">
+<h5 id="pyfgls-results-FGLSResults-to_dict" class="api-h"><a href="#pyfgls-results-FGLSResults-to_dict"><code>to_dict</code></a> <span class="api-kind">method</span></h5>
+<div class="code sig"><pre><code>to_dict()</code></pre></div>
+<p>JSON-friendly dictionary of the main results.</p>
+</div>
+<div class="api-obj api-method">
+<h5 id="pyfgls-results-FGLSResults-to_json" class="api-h"><a href="#pyfgls-results-FGLSResults-to_json"><code>to_json</code></a> <span class="api-kind">method</span></h5>
+<div class="code sig"><pre><code>to_json(**kwargs)</code></pre></div>
+<p>JSON string of <code>to_dict()</code> (keyword arguments go to <code>json.dumps</code>).</p>
+</div>
+<div class="api-obj api-method">
+<h5 id="pyfgls-results-FGLSResults-summary" class="api-h"><a href="#pyfgls-results-FGLSResults-summary"><code>summary</code></a> <span class="api-kind">method</span></h5>
+<div class="code sig"><pre><code>summary(alpha=0.05)</code></pre></div>
+<p>Return the formatted summary (print it, or use <code>str()</code>).</p>
+</div>
+<div class="api-obj api-method">
+<h5 id="pyfgls-results-FGLSResults-plot_diagnostics" class="api-h"><a href="#pyfgls-results-FGLSResults-plot_diagnostics"><code>plot_diagnostics</code></a> <span class="api-kind">method</span></h5>
+<div class="code sig"><pre><code>plot_diagnostics(**kwargs)</code></pre></div>
+<p>Diagnostic plots; see <a href="#pyfgls-plotting-plot_diagnostics"><code>pyfgls.plotting.plot_diagnostics()</code></a>.</p>
+<p>Requires the <code>plot</code> extra (<code>pip install pyfgls[plot]</code>).</p>
+</div>
+</div>
+<div class="api-obj api-function">
+<h4 id="pyfgls-results-compare" class="api-h"><a href="#pyfgls-results-compare"><code>pyfgls.results.compare</code></a> <span class="api-kind">function</span></h4>
+<div class="code sig"><pre><code>pyfgls.results.compare(results, *, alpha=0.05, names=None)</code></pre></div>
+<p>Side-by-side table of several fits (coefficients, standard errors, CI widths).</p>
+<p class="api-label">parameters</p>
+<dl class="api-items">
+<dt><code>results</code> <span class="api-type">sequence of FGLSResults</span></dt>
+<dd></dd>
+<dt><code>alpha</code> <span class="api-type">float</span></dt>
+<dd><p>Level for the confidence-interval width.</p>
+</dd>
+<dt><code>names</code> <span class="api-type">sequence of str</span></dt>
+<dd><p>Column labels (default: each result's <code>method</code>, de-duplicated).</p>
+</dd>
+</dl>
+<p class="api-label">returns</p>
+<dl class="api-items">
+<dt><span class="api-type">pandas.DataFrame</span></dt>
+<dd><p>Rows <code>(coefficient, statistic)</code> with statistics <code>coef</code>, <code>std err</code>,
+<code>CI width</code>; columns one per result.</p>
+</dd>
+</dl>
+</div>
+<h3 id="api-benchmarks"><a href="#api-benchmarks">Benchmarks</a></h3>
+<div class="api-obj api-module">
+<h4 id="pyfgls-benchmarks" class="api-h"><a href="#pyfgls-benchmarks"><code>pyfgls.benchmarks</code></a> <span class="api-kind">module</span></h4>
+<p>Benchmark estimators used for comparisons, tests and the papers' simulations.</p>
+<ul>
+<li><a href="#pyfgls-benchmarks-ols"><code>ols()</code></a> — OLS with HAC (Andrews quadratic-spectral or Newey–West) or HC
+standard errors;</li>
+<li><a href="#pyfgls-benchmarks-cochrane_orcutt"><code>cochrane_orcutt()</code></a> — the classic (iterated) Cochrane–Orcutt FGLS. <strong>It is
+not valid with non-exogenous regressors</strong>: it estimates the AR coefficient from OLS
+residuals, and OLS is inconsistent in that case ([PG26] Section 3);</li>
+<li><a href="#pyfgls-benchmarks-durbin"><code>durbin()</code></a> — the Durbin-regression estimator <code>beta^D</code> of [PG26] eq. (14);</li>
+<li><a href="#pyfgls-benchmarks-infeasible_gls"><code>infeasible_gls()</code></a> — GLS with known AR coefficients or a known covariance
+matrix (simulation benchmark only);</li>
+<li><a href="#pyfgls-benchmarks-hybrid_gls"><code>hybrid_gls()</code></a> — the &quot;hybrid&quot; estimator of [PG26] Supplement S-1 (exogenous
+regressors only).</li>
+</ul>
+<div class="api-obj api-function">
+<h5 id="pyfgls-benchmarks-ols" class="api-h"><a href="#pyfgls-benchmarks-ols"><code>ols</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.benchmarks.ols(
+    y,
+    X=None,
+    *,
+    cov_type='HAC',
+    kernel=None,
+    bandwidth=None,
+    small_sample=False,
+    use_t=False,
+)</code></pre></div>
+<p>OLS with HAC or heteroskedasticity-robust standard errors.</p>
+<p class="api-label">parameters</p>
+<dl class="api-items">
+<dt><code>y</code> <span class="api-type">data (or a validated :class:`~pyfgls._validation.RegressionData` as ``y``)</span></dt>
+<dd></dd>
+<dt><code>X</code> <span class="api-type">data (or a validated :class:`~pyfgls._validation.RegressionData` as ``y``)</span></dt>
+<dd></dd>
+<dt><code>cov_type</code> <span class="api-type">(&#x27;HAC&#x27;, &#x27;NW&#x27;, &#x27;HC0&#x27;, &#x27;HC1&#x27;, &#x27;HC2&#x27;, &#x27;HC3&#x27;, &#x27;nonrobust&#x27;)</span></dt>
+<dd><p><code>&quot;HAC&quot;</code>: Andrews (1991) quadratic-spectral kernel with automatic bandwidth
+(AR(1) approximation); <code>&quot;NW&quot;</code>: Newey–West Bartlett kernel with
+<code>floor(4 (T/100)^{2/9})</code> lags; <code>&quot;HC*&quot;</code>: White-type.</p>
+</dd>
+<dt><code>kernel</code> <span class="api-type">optional overrides for the HAC estimator.</span></dt>
+<dd></dd>
+<dt><code>bandwidth</code> <span class="api-type">optional overrides for the HAC estimator.</span></dt>
+<dd></dd>
+<dt><code>small_sample</code> <span class="api-type">bool</span></dt>
+<dd><p>Multiply HAC covariances by <code>T/(T-q)</code>.</p>
+</dd>
+<dt><code>use_t</code> <span class="api-type">bool</span></dt>
+<dd></dd>
+</dl>
+<p class="api-label">examples</p>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pyfgls.simulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">serial_dgp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sim</span> <span class="o">=</span> <span class="n">serial_dgp</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ols</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">method</span>
+<span class="go">'OLS'</span></code></pre></div>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-benchmarks-cochrane_orcutt" class="api-h"><a href="#pyfgls-benchmarks-cochrane_orcutt"><code>cochrane_orcutt</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.benchmarks.cochrane_orcutt(
+    y,
+    X=None,
+    *,
+    ar_order=1,
+    iterate=False,
+    max_iter=100,
+    tol=1e-08,
+    use_t=False,
+)</code></pre></div>
+<p>Cochrane–Orcutt FGLS for AR(p) errors (two-step by default, or iterated).</p>
+<p>The two-step version (the &quot;CO-FGLS&quot; of [PG26] Section 3 and Table 1) estimates the
+AR coefficients by regressing the OLS residuals on their own lags and then applies
+OLS to the quasi-differenced data. <strong>It is invalid with non-exogenous regressors</strong>:
+the OLS residuals inherit the inconsistency of OLS and so does the estimated filter
+(in the Table 1 design, rho = 0.8 is estimated with a bias of about -0.17) — use
+<a href="#pyfgls-SerialFGLS"><code>SerialFGLS</code></a> instead.</p>
+<p>With <code>iterate=True</code> the two steps are repeated until the AR coefficients
+converge; the fixed point is the nonlinear least-squares estimate of the
+common-factor AR(p) model, which (unlike the two-step version) does not rely on OLS
+residuals, but it is only valid when the AR(p) error model is correctly specified.</p>
+<p>The covariance is the conventional <code>s^2 (Xf'Xf)^{-1}</code> of the last filtered
+regression.</p>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-benchmarks-durbin" class="api-h"><a href="#pyfgls-benchmarks-durbin"><code>durbin</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.benchmarks.durbin(
+    y,
+    X=None,
+    *,
+    ar_order=None,
+    kmax=None,
+    use_t=False,
+)</code></pre></div>
+<p>Estimate <code>beta^D</code> by the Durbin regression ([PG26] eq. (14)).</p>
+<p>The coefficients on the contemporaneous regressors of the Durbin regression (AR
+order by BIC unless <code>ar_order</code> is given), with their conventional OLS covariance.</p>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-benchmarks-infeasible_gls" class="api-h"><a href="#pyfgls-benchmarks-infeasible_gls"><code>infeasible_gls</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.benchmarks.infeasible_gls(
+    y,
+    X=None,
+    *,
+    rho=None,
+    omega=None,
+    use_t=False,
+)</code></pre></div>
+<p>GLS with a known error structure (simulation benchmark).</p>
+<p class="api-label">parameters</p>
+<dl class="api-items">
+<dt><code>rho</code> <span class="api-type">array_like</span></dt>
+<dd><p>Known AR coefficients: the data are quasi-differenced (first <code>k</code> observations
+dropped) and OLS is applied — exactly GLS conditional on the initial values.</p>
+</dd>
+<dt><code>omega</code> <span class="api-type">array_like(T, T)</span></dt>
+<dd><p>Known error covariance matrix (up to scale): GLS by Cholesky whitening.</p>
+</dd>
+</dl>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-benchmarks-hybrid_gls" class="api-h"><a href="#pyfgls-benchmarks-hybrid_gls"><code>hybrid_gls</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.benchmarks.hybrid_gls(
+    y,
+    X=None,
+    *,
+    alpha=0.05,
+    lags=1,
+    random_state=None,
+    use_t=False,
+)</code></pre></div>
+<p>Hybrid OLS/GLS of [PG26] Supplement S-1 (<strong>exogenous regressors only</strong>).</p>
+<p>Run the Breusch–Godfrey LM test for serial correlation of the OLS residuals
+(<code>lags</code> lags). If it does not reject at level <code>alpha</code> return OLS (HAC
+standard errors); otherwise quasi-difference with an AR(1) coefficient drawn from
+<code>U(0.1, 0.9)</code> (or <code>U(-0.9, -0.1)</code>) with the sign of the first-order sample
+autocorrelation of the OLS residuals. With exogenous regressors and AR(1)-type
+errors, quasi-differencing with any coefficient of the right sign reduces the
+MSE relative to OLS (Supplement Corollary A.1).</p>
+</div>
+</div>
+<h3 id="api-diagnostics"><a href="#api-diagnostics">Diagnostics</a></h3>
+<div class="api-obj api-module">
+<h4 id="pyfgls-diagnostics" class="api-h"><a href="#pyfgls-diagnostics"><code>pyfgls.diagnostics</code></a> <span class="api-kind">module</span></h4>
+<p>Diagnostics: pre-determinedness test, AR roots, stationarity screening, weight checks.</p>
+<ul>
+<li><a href="#pyfgls-diagnostics-test_predetermined"><code>test_predetermined()</code></a> — the variable-addition LM test of [PG26] Remark 9
+(<strong>experimental</strong>): are lags of the stochastic regressors missing from the model?</li>
+<li><a href="#pyfgls-diagnostics-adf_test"><code>adf_test()</code></a> / <a href="#pyfgls-diagnostics-check_stationarity"><code>check_stationarity()</code></a> — augmented Dickey–Fuller screening
+(warnings only);</li>
+<li><a href="#pyfgls-diagnostics-weight_diagnostics"><code>weight_diagnostics()</code></a> — how concentrated the FGLS weights are;</li>
+<li><a href="#pyfgls-diagnostics-ar_roots"><code>ar_roots()</code></a>, <a href="#pyfgls-diagnostics-nonexogeneity_share"><code>nonexogeneity_share()</code></a> — convenience accessors.</li>
+</ul>
+<div class="api-obj api-dataclass">
+<h5 id="pyfgls-diagnostics-PredeterminedTest" class="api-h"><a href="#pyfgls-diagnostics-PredeterminedTest"><code>PredeterminedTest</code></a> <span class="api-kind">dataclass</span></h5>
+<div class="code sig"><pre><code>pyfgls.diagnostics.PredeterminedTest(
+    table,
+    ar_order,
+    regressors,
+    alpha,
+    advice,
+)</code></pre></div>
+<p>Result of <a href="#pyfgls-diagnostics-test_predetermined"><code>test_predetermined()</code></a>.</p>
+<p class="api-label">attributes</p>
+<dl class="api-items">
+<dt><code>table</code> <span class="api-type">pandas.DataFrame</span></dt>
+<dd><p>One row per number of added lags <code>l</code>: LM statistic <code>n R^2</code>, degrees of
+freedom, p-value.</p>
+</dd>
+<dt><code>ar_order</code> <span class="api-type">int</span></dt>
+<dd><p>AR order of the Durbin regression used for <code>beta^D</code>.</p>
+</dd>
+<dt><code>regressors</code> <span class="api-type">tuple of str</span></dt>
+<dd><p>Stochastic regressors whose lags were added.</p>
+</dd>
+<dt><code>alpha</code> <span class="api-type">float</span></dt>
+<dd></dd>
+<dt><code>advice</code> <span class="api-type">str</span></dt>
+<dd></dd>
+</dl>
+<div class="api-obj api-property">
+<h6 id="pyfgls-diagnostics-PredeterminedTest-rejected" class="api-h"><a href="#pyfgls-diagnostics-PredeterminedTest-rejected"><code>rejected</code></a> <span class="api-kind">property</span></h6>
+<p>Whether any of the sequential tests rejects at level <code>alpha</code>.</p>
+</div>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-diagnostics-test_predetermined" class="api-h"><a href="#pyfgls-diagnostics-test_predetermined"><code>test_predetermined</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.diagnostics.test_predetermined(
+    y,
+    X,
+    max_lag=4,
+    *,
+    ar_order=None,
+    kmax=None,
+    regressors=None,
+    alpha=0.05,
+    scale='innovations',
+)</code></pre></div>
+<p>Variable-addition LM test for missing lags of the regressors ([PG26] Remark 9).</p>
+<p><strong>Experimental.</strong> Steps: (a) Durbin regression (AR order by BIC) giving <code>beta^D</code>
+and <code>rho^D</code>; (b) residuals <code>u^D = y - X beta^D</code>; (c) demean; (d) for
+<code>l = 1, ..., max_lag</code> test whether lags <code>1..l</code> of the stochastic regressors
+belong in the model with the variable-addition statistic</p>
+<div class="code" data-lang="output"><div class="code-head"><span class="code-lang">output</span></div><pre><code>LM_l = n (SSR_0 - SSR_1) / SSR_0  ~  chi^2(l m)   (m regressors tested),</code></pre></div>
+<p>where <code>SSR_0</code> and <code>SSR_1</code> are the residual sums of squares of the auxiliary
+regression without and with the candidate lags. A rejection suggests adding lags of
+the regressors to the model (so that they become pre-determined) and refitting.</p>
+<p><code>scale=&quot;innovations&quot;</code> (default) runs the auxiliary regression on the innovation
+scale: <code>u^D</code> and all regressors are filtered with the Durbin AR filter and the
+lagged <code>u^D</code> enter as nuisance regressors. Under pre-determinedness the filtered
+residuals are (approximately) serially uncorrelated innovations, uncorrelated with
+past regressors even when those are not exogenous, so the chi-square approximation
+holds. <code>scale=&quot;errors&quot;</code> uses <code>u^D</code> and the raw regressors directly (the literal
+reading of Remark 9).</p>
+<p class="api-label">parameters</p>
+<dl class="api-items">
+<dt><code>y</code> <span class="api-type">data</span></dt>
+<dd></dd>
+<dt><code>X</code> <span class="api-type">data</span></dt>
+<dd></dd>
+<dt><code>max_lag</code> <span class="api-type">int</span></dt>
+<dd><p>Largest number of lags added.</p>
+</dd>
+<dt><code>ar_order</code> <span class="api-type">int</span></dt>
+<dd><p>AR order of the Durbin regression (default: BIC).</p>
+</dd>
+<dt><code>kmax</code> <span class="api-type">int</span></dt>
+<dd><p>Largest order for the BIC selection.</p>
+</dd>
+<dt><code>regressors</code> <span class="api-type">list of str</span></dt>
+<dd><p>Regressors to test (default: all non-constant regressors).</p>
+</dd>
+<dt><code>alpha</code> <span class="api-type">float</span></dt>
+<dd><p>Level used for the advice.</p>
+</dd>
+<dt><code>scale</code> <span class="api-type">(&#x27;innovations&#x27;, &#x27;errors&#x27;)</span></dt>
+<dd><p>Scale of the auxiliary regression (see above).</p>
+</dd>
+</dl>
+</div>
+<div class="api-obj api-dataclass">
+<h5 id="pyfgls-diagnostics-ADFResult" class="api-h"><a href="#pyfgls-diagnostics-ADFResult"><code>ADFResult</code></a> <span class="api-kind">dataclass</span></h5>
+<div class="code sig"><pre><code>pyfgls.diagnostics.ADFResult(statistic, lags, nobs, critical_values)</code></pre></div>
+<p>Augmented Dickey–Fuller test with a constant.</p>
+<div class="api-obj api-property">
+<h6 id="pyfgls-diagnostics-ADFResult-unit_root_rejected" class="api-h"><a href="#pyfgls-diagnostics-ADFResult-unit_root_rejected"><code>unit_root_rejected</code></a> <span class="api-kind">property</span></h6>
+<p>Rejection at the 5% level (series looks stationary).</p>
+</div>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-diagnostics-adf_test" class="api-h"><a href="#pyfgls-diagnostics-adf_test"><code>adf_test</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.diagnostics.adf_test(x, *, max_lags=None)</code></pre></div>
+<p>ADF regression <code>dx_t = a + g x_{t-1} + sum_j c_j dx_{t-j} + e_t</code> (BIC lags).</p>
+<p>Returns the t statistic on <code>g</code> with asymptotic MacKinnon critical values.</p>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-diagnostics-check_stationarity" class="api-h"><a href="#pyfgls-diagnostics-check_stationarity"><code>check_stationarity</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.diagnostics.check_stationarity(data)</code></pre></div>
+<p>ADF screening of <code>y</code> and every non-constant regressor (warnings only).</p>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-diagnostics-weight_diagnostics" class="api-h"><a href="#pyfgls-diagnostics-weight_diagnostics"><code>weight_diagnostics</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.diagnostics.weight_diagnostics(res)</code></pre></div>
+<p>Concentration of the FGLS weights <code>1/v_t</code>.</p>
+<p>Returns the max/min variance ratio, the Kish effective sample size
+<code>(sum w)^2 / sum w^2</code> (as a share of <code>n</code>) and the share of the total weight
+carried by the top 1% of observations.</p>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-diagnostics-ar_roots" class="api-h"><a href="#pyfgls-diagnostics-ar_roots"><code>ar_roots</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.diagnostics.ar_roots(res)</code></pre></div>
+<p>Roots of the estimated AR polynomial of a serial-correlation fit.</p>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-diagnostics-nonexogeneity_share" class="api-h"><a href="#pyfgls-diagnostics-nonexogeneity_share"><code>nonexogeneity_share</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.diagnostics.nonexogeneity_share(res)</code></pre></div>
+<p>[PG26] first-stage correction relative to the naive variance (see FGLSResults).</p>
+</div>
+</div>
+<h3 id="api-scikit-learn-wrapper"><a href="#api-scikit-learn-wrapper">scikit-learn wrapper</a></h3>
+<div class="api-obj api-class">
+<h4 id="pyfgls-sklearn-FGLSRegressor" class="api-h"><a href="#pyfgls-sklearn-FGLSRegressor"><code>pyfgls.sklearn.FGLSRegressor</code></a> <span class="api-kind">class</span></h4>
+<div class="code sig"><pre><code>pyfgls.sklearn.FGLSRegressor(
+    serial='auto',
+    hetero='lasso',
+    *,
+    fit_intercept=True,
+    ar_order=None,
+    kmax=None,
+    ic='bic',
+    z='auto',
+    cv_folds=10,
+    random_state=None,
+    n_jobs=None,
+    cov_type='robust',
+)</code></pre></div>
+<p>scikit-learn estimator wrapping <a href="#pyfgls-FGLS"><code>pyfgls.FGLS</code></a>.</p>
+<p class="api-label">parameters</p>
+<dl class="api-items">
+<dt><code>serial</code> <span class="api-type">(&#x27;auto&#x27;, &#x27;fixed&#x27;, &#x27;ma1&#x27;, None)</span></dt>
+<dd><p>Serial-correlation correction (see <a href="#pyfgls-FGLS"><code>pyfgls.FGLS</code></a>).</p>
+</dd>
+<dt><code>hetero</code> <span class="api-type">(&#x27;lasso&#x27;, &#x27;svr&#x27;, &#x27;wls_s1&#x27;, &#x27;wls_s2&#x27;, None)</span></dt>
+<dd><p>Heteroskedasticity correction.</p>
+</dd>
+<dt><code>fit_intercept</code> <span class="api-type">bool</span></dt>
+<dd><p>Add a constant column.</p>
+</dd>
+<dt><code>ar_order</code>, <code>kmax</code>, <code>ic</code>, <code>z</code>, <code>cv_folds</code>, <code>random_state</code>, <code>n_jobs</code></dt>
+<dd><p>Passed to <a href="#pyfgls-FGLS"><code>pyfgls.FGLS</code></a>.</p>
+</dd>
+<dt><code>cov_type</code> <span class="api-type">str</span></dt>
+<dd><p>Covariance used for <code>results_</code>.</p>
+</dd>
+</dl>
+<p class="api-label">attributes</p>
+<dl class="api-items">
+<dt><code>coef_</code> <span class="api-type">ndarray</span></dt>
+<dd></dd>
+<dt><code>intercept_</code> <span class="api-type">float</span></dt>
+<dd></dd>
+<dt><code>results_</code> <span class="api-type">FGLSResults</span></dt>
+<dd></dd>
+<dt><code>n_features_in_</code> <span class="api-type">int</span></dt>
+<dd></dd>
+</dl>
+<p class="api-label">examples</p>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pyfgls.simulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">hetero_dgp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sim</span> <span class="o">=</span> <span class="n">hetero_dgp</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reg</span> <span class="o">=</span> <span class="n">FGLSRegressor</span><span class="p">(</span><span class="n">serial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">sim</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reg</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(1,)</span></code></pre></div>
+<div class="api-obj api-method">
+<h5 id="pyfgls-sklearn-FGLSRegressor-fit" class="api-h"><a href="#pyfgls-sklearn-FGLSRegressor-fit"><code>fit</code></a> <span class="api-kind">method</span></h5>
+<div class="code sig"><pre><code>fit(X, y)</code></pre></div>
+<p>Fit the FGLS model to <code>(X, y)</code>.</p>
+</div>
+<div class="api-obj api-method">
+<h5 id="pyfgls-sklearn-FGLSRegressor-predict" class="api-h"><a href="#pyfgls-sklearn-FGLSRegressor-predict"><code>predict</code></a> <span class="api-kind">method</span></h5>
+<div class="code sig"><pre><code>predict(X)</code></pre></div>
+<p>Predict <code>intercept_ + X coef_</code>.</p>
+</div>
+</div>
+<h3 id="api-plots"><a href="#api-plots">Plots</a></h3>
+<div class="api-obj api-module">
+<h4 id="pyfgls-plotting" class="api-h"><a href="#pyfgls-plotting"><code>pyfgls.plotting</code></a> <span class="api-kind">module</span></h4>
+<p>Diagnostic plots (optional <code>plot</code> extra: <code>pip install pyfgls[plot]</code>).</p>
+<div class="api-obj api-function">
+<h5 id="pyfgls-plotting-acf" class="api-h"><a href="#pyfgls-plotting-acf"><code>acf</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.plotting.acf(x, nlags=20)</code></pre></div>
+<p>Sample autocorrelations <code>r_1..r_nlags</code>.</p>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-plotting-plot_intervals" class="api-h"><a href="#pyfgls-plotting-plot_intervals"><code>plot_intervals</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.plotting.plot_intervals(
+    results,
+    *,
+    params=None,
+    alpha=0.05,
+    labels=None,
+    ax=None,
+)</code></pre></div>
+<p>Point estimates with confidence intervals for several fits, side by side.</p>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-plotting-plot_diagnostics" class="api-h"><a href="#pyfgls-plotting-plot_diagnostics"><code>plot_diagnostics</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.plotting.plot_diagnostics(res, *, nlags=20, figsize=(10.0, 7.0))</code></pre></div>
+<p>Four diagnostic panels for an FGLS fit.</p>
+<ol>
+<li>final-stage residuals (estimated innovations) in time order;</li>
+<li>their autocorrelations with <code>+-1.96/sqrt(n)</code> bands (should look white);</li>
+<li>the BIC path over AR orders (serial fits) or the fitted variances against the
+fitted values (heteroskedasticity fits);</li>
+<li>coefficients and intervals of this fit next to OLS (HAC or HC3).</li>
+</ol>
+</div>
+</div>
+<h3 id="api-simulation-designs"><a href="#api-simulation-designs">Simulation designs</a></h3>
+<div class="api-obj api-module">
+<h4 id="pyfgls-simulate" class="api-h"><a href="#pyfgls-simulate"><code>pyfgls.simulate</code></a> <span class="api-kind">module</span></h4>
+<p>Data-generating processes from the simulation studies of the two papers.</p>
+<p>All functions return a <a href="#pyfgls-simulate-Simulation"><code>Simulation</code></a> with <code>y</code> (T,), <code>X</code> (T, q) including a
+constant column, and the latent errors, so the tests can compare estimators with the
+infeasible GLS benchmark.</p>
+<ul>
+<li><a href="#pyfgls-simulate-serial_dgp"><code>serial_dgp()</code></a> — [PG26] Section 5: <code>y_t = b0 + b1 x_t + u_t</code> with AR/MA errors
+and a regressor <code>x_t = rho_x x_{t-1} + v_t + gamma e_{t-1}</code> that is not exogenous
+when <code>gamma != 0</code> (Table 1 is <code>rho_x = 0</code>, <code>gamma = 1</code>, AR(1) <code>0.8</code>,
+<code>u_0 = 0</code>).</li>
+<li><a href="#pyfgls-simulate-hetero_dgp"><code>hetero_dgp()</code></a> — [GP24] eq. (9): <code>y_t = a + b x_t + sqrt(v(x_t)) eps_t</code> with
+<code>x_t ~ U[1, 4]</code>.</li>
+<li><a href="#pyfgls-simulate-combined_dgp"><code>combined_dgp()</code></a> — [PG26] Supplement S-4: serially correlated errors whose
+innovations are heteroskedastic, <code>e_t = sqrt(v(w_t)) eps_t</code>.</li>
+<li><a href="#pyfgls-simulate-predictive_dgp"><code>predictive_dgp()</code></a> — [PG26] Supplement S-3: predictive regression with MA(1)
+errors.</li>
+</ul>
+<div class="api-obj api-dataclass">
+<h5 id="pyfgls-simulate-Simulation" class="api-h"><a href="#pyfgls-simulate-Simulation"><code>Simulation</code></a> <span class="api-kind">dataclass</span></h5>
+<div class="code sig"><pre><code>pyfgls.simulate.Simulation(y, X, beta, u, e, info=dict())</code></pre></div>
+<p>Simulated regression data.</p>
+<p class="api-label">attributes</p>
+<dl class="api-items">
+<dt><code>y</code> <span class="api-type">ndarray(T)</span></dt>
+<dd></dd>
+<dt><code>X</code> <span class="api-type">ndarray(T, q)</span></dt>
+<dd><p>Regressors, first column the constant.</p>
+</dd>
+<dt><code>beta</code> <span class="api-type">ndarray(q)</span></dt>
+<dd><p>True coefficients.</p>
+</dd>
+<dt><code>u</code> <span class="api-type">ndarray(T)</span></dt>
+<dd><p>Regression errors.</p>
+</dd>
+<dt><code>e</code> <span class="api-type">ndarray(T)</span></dt>
+<dd><p>Innovations of the error process.</p>
+</dd>
+<dt><code>info</code> <span class="api-type">dict</span></dt>
+<dd><p>DGP parameters (AR/MA coefficients, variance function values, ...).</p>
+</dd>
+</dl>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-simulate-arma_errors" class="api-h"><a href="#pyfgls-simulate-arma_errors"><code>arma_errors</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.simulate.arma_errors(e, ar=(), ma=())</code></pre></div>
+<p><code>u_t = sum_i ar_i u_{t-i} + e_t + sum_i ma_i e_{t-i}</code> driven by innovations <code>e</code>.</p>
+<p>Pre-sample values of <code>u</code> and <code>e</code> are zero (the <code>u_0 = 0</code> initialisation of
+[PG26] Table 1).</p>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-simulate-serial_dgp" class="api-h"><a href="#pyfgls-simulate-serial_dgp"><code>serial_dgp</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.simulate.serial_dgp(
+    T,
+    *,
+    ar=(0.8,),
+    ma=(),
+    rho_x=0.0,
+    gamma=1.0,
+    beta=(1.0, 1.0),
+    burn=0,
+    random_state=None,
+)</code></pre></div>
+<p>[PG26] Section 5 DGP with a possibly non-exogenous regressor.</p>
+<p><code>y_t = b0 + b1 x_t + u_t</code>, <code>u_t</code> ARMA with N(0,1) innovations <code>e_t</code>,
+<code>x_t = rho_x x_{t-1} + v_t + gamma e_{t-1}</code>, <code>v_t ~ N(0,1)</code> independent of
+<code>e</code>. The regressor is pre-determined; it is exogenous iff <code>gamma = 0</code>.</p>
+<p>With the defaults (<code>rho_x = 0</code>, <code>gamma = 1</code>, AR(1) <code>0.8</code>, <code>burn = 0</code>) this is
+the [PG26] Table 1 design with <code>u_0 = 0</code>. Use <code>burn &gt; 0</code> to start from
+(approximately) the stationary distribution.</p>
+<p class="api-label">examples</p>
+<div class="code" data-lang="python"><div class="code-head"><span class="code-lang">python</span></div><pre><code><span class="gp">&gt;&gt;&gt; </span><span class="n">sim</span> <span class="o">=</span> <span class="n">serial_dgp</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sim</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(500, 2)</span></code></pre></div>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-simulate-hetero_dgp" class="api-h"><a href="#pyfgls-simulate-hetero_dgp"><code>hetero_dgp</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.simulate.hetero_dgp(
+    T,
+    *,
+    skedastic='x2',
+    beta=(1.0, 1.0),
+    n_extra=0,
+    extra_corr=0.0,
+    random_state=None,
+)</code></pre></div>
+<p>[GP24] eq. (9): <code>y_t = a + b x_t + sqrt(v(x_t)) eps_t</code>, <code>x_t ~ U[1, 4]</code>.</p>
+<p class="api-label">parameters</p>
+<dl class="api-items">
+<dt><code>T</code> <span class="api-type">int</span></dt>
+<dd></dd>
+<dt><code>skedastic</code> <span class="api-type">str or callable</span></dt>
+<dd><p>Key of <code>SKEDASTIC_FUNCTIONS</code> (<code>&quot;homoskedastic&quot;</code>, <code>&quot;x&quot;</code>, <code>&quot;x2&quot;</code>,
+<code>&quot;log2&quot;</code>, <code>&quot;exp&quot;</code>, <code>&quot;step&quot;</code>) or a function of <code>x</code>.</p>
+</dd>
+<dt><code>beta</code> <span class="api-type">(a, b)</span></dt>
+<dd></dd>
+<dt><code>n_extra</code> <span class="api-type">int</span></dt>
+<dd><p>Number of extra candidate covariates <code>w_j ~ U[1, 4]</code> (not regressors) for the
+robustness designs of [GP24] Section 5 (returned in <code>info[&quot;W&quot;]</code>).</p>
+</dd>
+<dt><code>extra_corr</code> <span class="api-type">float</span></dt>
+<dd><p>Correlation-inducing weight: <code>w_j = c x + (1 - c) q_j</code> with <code>q_j ~ U[1, 4]</code>.</p>
+</dd>
+<dt><code>random_state</code> <span class="api-type">int or Generator</span></dt>
+<dd></dd>
+</dl>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-simulate-combined_dgp" class="api-h"><a href="#pyfgls-simulate-combined_dgp"><code>combined_dgp</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.simulate.combined_dgp(
+    T,
+    *,
+    ar=(0.5,),
+    ma=(),
+    skedastic='x2',
+    beta=(1.0, 1.0),
+    driver='x',
+    phi_prob=0.75,
+    gamma=0.0,
+    burn=100,
+    random_state=None,
+)</code></pre></div>
+<p>[PG26] Supplement S-4: ARMA errors with heteroskedastic innovations.</p>
+<p><code>y_t = b0 + b1 x_t + u_t</code>, <code>x_t ~ U[1, 4]</code> iid, <code>u_t</code> ARMA driven by
+<code>e_t = sqrt(v(w_t)) eps_t</code>. The variance driver is <code>w_t = x_t</code> (<code>driver=&quot;x&quot;</code>,
+case (a)) or <code>w_t = phi_t x_t + (1 - phi_t) q_t</code> with <code>phi_t ~ Bernoulli(phi_prob)</code>
+and <code>q_t ~ U[1, 4]</code> (<code>driver=&quot;mixture&quot;</code>, case (b)). With <code>gamma != 0</code> the
+regressor becomes <code>x_t + gamma e_{t-1}</code> (pre-determined, not exogenous).
+The candidate covariates <code>w_t</code> are returned in <code>info[&quot;w&quot;]</code>.</p>
+</div>
+<div class="api-obj api-function">
+<h5 id="pyfgls-simulate-predictive_dgp" class="api-h"><a href="#pyfgls-simulate-predictive_dgp"><code>predictive_dgp</code></a> <span class="api-kind">function</span></h5>
+<div class="code sig"><pre><code>pyfgls.simulate.predictive_dgp(
+    T,
+    *,
+    theta=0.5,
+    rho_x=0.0,
+    gamma=0.0,
+    beta=(1.0, 1.0),
+    burn=100,
+    random_state=None,
+)</code></pre></div>
+<p>[PG26] Supplement S-3 predictive regression <code>y_{t+2} = a + b x_t + u_{t+2}</code>.</p>
+<p><code>u_t = e_t + theta e_{t-1}</code>, <code>x_t = rho_x x_{t-1} + v_t + gamma e_{t-1}</code>.
+Returned aligned: <code>y[t]</code> is <code>y_{t+2}</code> and <code>X[t] = (1, x_t)</code>.</p>
+</div>
+</div>
+<h3 id="api-exceptions-and-warnings"><a href="#api-exceptions-and-warnings">Exceptions and warnings</a></h3>
+<div class="api-obj api-module">
+<h4 id="pyfgls-exceptions" class="api-h"><a href="#pyfgls-exceptions"><code>pyfgls.exceptions</code></a> <span class="api-kind">module</span></h4>
+<p>Warnings and exceptions raised by pyfgls.</p>
+<p>Every warning derives from <a href="#pyfgls-exceptions-PyFGLSWarning"><code>PyFGLSWarning</code></a> and every error from
+<a href="#pyfgls-exceptions-PyFGLSError"><code>PyFGLSError</code></a>, so users can filter or catch them as a group:</p>
+<div class="code" data-lang="output"><div class="code-head"><span class="code-lang">output</span></div><pre><code>import warnings
+from pyfgls.exceptions import PyFGLSWarning
+
+warnings.simplefilter(&quot;ignore&quot;, PyFGLSWarning)</code></pre></div>
+<div class="api-obj api-class">
+<h5 id="pyfgls-exceptions-PyFGLSWarning" class="api-h"><a href="#pyfgls-exceptions-PyFGLSWarning"><code>PyFGLSWarning</code></a> <span class="api-kind">class</span></h5>
+<div class="code sig"><pre><code>pyfgls.exceptions.PyFGLSWarning</code></pre></div>
+<p>Base class for all warnings emitted by pyfgls.</p>
+</div>
+<div class="api-obj api-class">
+<h5 id="pyfgls-exceptions-NonStationaryWarning" class="api-h"><a href="#pyfgls-exceptions-NonStationaryWarning"><code>NonStationaryWarning</code></a> <span class="api-kind">class</span></h5>
+<div class="code sig"><pre><code>pyfgls.exceptions.NonStationaryWarning</code></pre></div>
+<p>The estimated autoregressive filter is (close to) non-invertible.</p>
+<p>Raised when a root of <code>1 - rho_1 z - ... - rho_k z^k</code> lies inside, on, or very
+close to the unit circle. FGLS assumes stationary, invertible errors
+([PG26] Assumption 2); consider differencing or a unit-root test.</p>
+</div>
+<div class="api-obj api-class">
+<h5 id="pyfgls-exceptions-CollinearityWarning" class="api-h"><a href="#pyfgls-exceptions-CollinearityWarning"><code>CollinearityWarning</code></a> <span class="api-kind">class</span></h5>
+<div class="code sig"><pre><code>pyfgls.exceptions.CollinearityWarning</code></pre></div>
+<p>Columns were dropped because they are (nearly) collinear with others.</p>
+<p>pyfgls only drops columns automatically where it is safe, e.g. lagged constants or
+lagged trends in the lagged-regressor block of the Durbin regression.</p>
+</div>
+<div class="api-obj api-class">
+<h5 id="pyfgls-exceptions-ConvergenceWarning" class="api-h"><a href="#pyfgls-exceptions-ConvergenceWarning"><code>ConvergenceWarning</code></a> <span class="api-kind">class</span></h5>
+<div class="code sig"><pre><code>pyfgls.exceptions.ConvergenceWarning</code></pre></div>
+<p>An iterative routine (Lasso, SVR, MLE) did not fully converge.</p>
+</div>
+<div class="api-obj api-class">
+<h5 id="pyfgls-exceptions-WeightWarning" class="api-h"><a href="#pyfgls-exceptions-WeightWarning"><code>WeightWarning</code></a> <span class="api-kind">class</span></h5>
+<div class="code sig"><pre><code>pyfgls.exceptions.WeightWarning</code></pre></div>
+<p>The estimated FGLS weights are extreme (very large max/min ratio).</p>
+</div>
+<div class="api-obj api-class">
+<h5 id="pyfgls-exceptions-SampleSizeWarning" class="api-h"><a href="#pyfgls-exceptions-SampleSizeWarning"><code>SampleSizeWarning</code></a> <span class="api-kind">class</span></h5>
+<div class="code sig"><pre><code>pyfgls.exceptions.SampleSizeWarning</code></pre></div>
+<p>The sample is small relative to the number of parameters, lags, or folds.</p>
+</div>
+<div class="api-obj api-class">
+<h5 id="pyfgls-exceptions-SpecificationWarning" class="api-h"><a href="#pyfgls-exceptions-SpecificationWarning"><code>SpecificationWarning</code></a> <span class="api-kind">class</span></h5>
+<div class="code sig"><pre><code>pyfgls.exceptions.SpecificationWarning</code></pre></div>
+<p>The model specification looks unusual (e.g. no intercept).</p>
+</div>
+<div class="api-obj api-class">
+<h5 id="pyfgls-exceptions-LaggedDependentWarning" class="api-h"><a href="#pyfgls-exceptions-LaggedDependentWarning"><code>LaggedDependentWarning</code></a> <span class="api-kind">class</span></h5>
+<div class="code sig"><pre><code>pyfgls.exceptions.LaggedDependentWarning</code></pre></div>
+<p>A regressor looks like a lag of the dependent variable.</p>
+<p>Declare such regressors with <code>lagged_dep_vars=[...]</code> so the Durbin regression is
+run with the appropriate order ([PG26] Section 4.2).</p>
+</div>
+<div class="api-obj api-class">
+<h5 id="pyfgls-exceptions-ExperimentalWarning" class="api-h"><a href="#pyfgls-exceptions-ExperimentalWarning"><code>ExperimentalWarning</code></a> <span class="api-kind">class</span></h5>
+<div class="code sig"><pre><code>pyfgls.exceptions.ExperimentalWarning</code></pre></div>
+<p>The feature is experimental; results and API may change.</p>
+</div>
+<div class="api-obj api-class">
+<h5 id="pyfgls-exceptions-PyFGLSError" class="api-h"><a href="#pyfgls-exceptions-PyFGLSError"><code>PyFGLSError</code></a> <span class="api-kind">class</span></h5>
+<div class="code sig"><pre><code>pyfgls.exceptions.PyFGLSError</code></pre></div>
+<p>Base class for all errors raised by pyfgls.</p>
+</div>
+<div class="api-obj api-class">
+<h5 id="pyfgls-exceptions-InputError" class="api-h"><a href="#pyfgls-exceptions-InputError"><code>InputError</code></a> <span class="api-kind">class</span></h5>
+<div class="code sig"><pre><code>pyfgls.exceptions.InputError</code></pre></div>
+<p>The inputs are invalid (wrong shape, non-numeric, inconsistent, ...).</p>
+</div>
+<div class="api-obj api-class">
+<h5 id="pyfgls-exceptions-MissingDataError" class="api-h"><a href="#pyfgls-exceptions-MissingDataError"><code>MissingDataError</code></a> <span class="api-kind">class</span></h5>
+<div class="code sig"><pre><code>pyfgls.exceptions.MissingDataError</code></pre></div>
+<p>The inputs contain missing or non-finite values that cannot be handled.</p>
+</div>
+<div class="api-obj api-class">
+<h5 id="pyfgls-exceptions-TimeIndexError" class="api-h"><a href="#pyfgls-exceptions-TimeIndexError"><code>TimeIndexError</code></a> <span class="api-kind">class</span></h5>
+<div class="code sig"><pre><code>pyfgls.exceptions.TimeIndexError</code></pre></div>
+<p>The time index is unsorted, duplicated, has gaps, or is a panel index.</p>
+</div>
+<div class="api-obj api-class">
+<h5 id="pyfgls-exceptions-CollinearityError" class="api-h"><a href="#pyfgls-exceptions-CollinearityError"><code>CollinearityError</code></a> <span class="api-kind">class</span></h5>
+<div class="code sig"><pre><code>pyfgls.exceptions.CollinearityError</code></pre></div>
+<p>The regressor matrix is rank deficient.</p>
+</div>
+<div class="api-obj api-class">
+<h5 id="pyfgls-exceptions-InsufficientDataError" class="api-h"><a href="#pyfgls-exceptions-InsufficientDataError"><code>InsufficientDataError</code></a> <span class="api-kind">class</span></h5>
+<div class="code sig"><pre><code>pyfgls.exceptions.InsufficientDataError</code></pre></div>
+<p>There are too few observations for the requested model.</p>
+</div>
+</div>
+</section>
+<section class="doc-section" aria-labelledby="replication">
+<h2 id="replication" class="doc-h2"><a href="#replication">Replication</a></h2>
+<p>The <code>tests/statistical</code> suite reproduces the papers' simulations with fewer replications
+(<code>pytest --runslow tests/statistical</code>, run nightly in CI). The scripts in <code>benchmarks/</code>
+produce full tables.</p>
+<div class="code" data-lang="shell"><div class="code-head"><span class="code-lang">shell</span></div><pre><code>python<span class="w"> </span>benchmarks/replicate_pg26_tables.py<span class="w"> </span>--table<span class="w"> </span><span class="m">1</span><span class="w"> </span>--reps<span class="w"> </span><span class="m">10000</span>
+python<span class="w"> </span>benchmarks/replicate_pg26_tables.py<span class="w"> </span>--table<span class="w"> </span>general<span class="w"> </span>--reps<span class="w"> </span><span class="m">2000</span>
+python<span class="w"> </span>benchmarks/replicate_gp24_tables.py<span class="w"> </span>--reps<span class="w"> </span><span class="m">2000</span><span class="w"> </span>--T<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="m">200</span><span class="w"> </span><span class="m">400</span></code></pre></div>
+<p>Runtimes on one core of an Apple M1 Pro: about 1.5 minutes for Table 1 with 10,000
+replications, 3–4 minutes for the general case with 2,000, and about 20 minutes for the
+[GP24] tables with 2,000 replications at T = 100, 200, 400. The scripts use every core by
+default (<code>--jobs -1</code>), which divides these times roughly by the number of cores; <code>--seed</code>
+fixes the draws.</p>
+<h3 id="pg26-table-1-t-500-ar1-08-non-exogenous-regressor"><a href="#pg26-table-1-t-500-ar1-08-non-exogenous-regressor">[PG26] Table 1 (T = 500, AR(1) 0.8, non-exogenous regressor)</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Estimator</th>
+<th>paper RMSE</th>
+<th>pyfgls RMSE (5,000 reps)</th>
+<th>paper bias</th>
+<th>pyfgls bias</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OLS</td>
+<td>0.399</td>
+<td>0.398</td>
+<td>0.395</td>
+<td>0.394</td>
+</tr>
+<tr>
+<td>Durbin</td>
+<td>0.036</td>
+<td>0.037</td>
+<td>0.002</td>
+<td>0.001</td>
+</tr>
+<tr>
+<td>Infeasible GLS</td>
+<td>0.025</td>
+<td>0.024</td>
+<td>0.000</td>
+<td>0.000</td>
+</tr>
+<tr>
+<td>FGLS</td>
+<td>0.025</td>
+<td>0.026</td>
+<td>0.001</td>
+<td>0.001</td>
+</tr>
+<tr>
+<td>Cochrane–Orcutt (two-step)</td>
+<td>0.041</td>
+<td>0.041</td>
+<td>0.031</td>
+<td>0.031</td>
+</tr>
+<tr>
+<td>ρ̂ FGLS (<span class="math">\(\sum_j\hat\rho_j\)</span>)</td>
+<td>0.034</td>
+<td>0.034</td>
+<td>−0.008</td>
+<td>−0.008</td>
+</tr>
+<tr>
+<td>ρ̂ Cochrane–Orcutt</td>
+<td>0.174</td>
+<td>0.174</td>
+<td>−0.171</td>
+<td>−0.170</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="pg26-general-case-t-200-08"><a href="#pg26-general-case-t-200-08">[PG26] general case (T = 200, <span class="math">\(\rho_x\)</span> = 0.8)</a></h3>
+<p>AR(2) errors (1.34, −0.42), exogenous regressor: MSE×100 of OLS 10.7 and FGLS 0.405
+(paper: 11.5 and 0.41). Robust 95% intervals cover between 0.93 and 0.95 for AR(1) and
+AR(2) errors with <span class="math">\(\gamma \in \{0, 0.25, 0.5\}\)</span>; the naive intervals under-cover when
+<span class="math">\(\gamma \ne 0\)</span>.</p>
+<h3 id="gp24-table-1-slope-emse-of-lasso-fgls-relative-to-ols"><a href="#gp24-table-1-slope-emse-of-lasso-fgls-relative-to-ols">[GP24] Table 1 (slope eMSE of Lasso-FGLS relative to OLS)</a></h3>
+<p>pyfgls (2,000 replications per cell) / paper (10,000 replications):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>v(x)</th>
+<th>T = 100</th>
+<th>T = 200</th>
+<th>T = 400</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1.02–1.04 / 1.01</td>
+<td>1.04 / 1.00</td>
+<td>1.00 / 1.00</td>
+</tr>
+<tr>
+<td>x</td>
+<td>0.97 / 0.92</td>
+<td>0.97 / 0.92</td>
+<td>0.92 / 0.92</td>
+</tr>
+<tr>
+<td>x²</td>
+<td>0.77 / 0.70</td>
+<td>0.75 / 0.70</td>
+<td>0.70 / 0.70</td>
+</tr>
+<tr>
+<td>(log x)²</td>
+<td>0.58 / 0.54</td>
+<td>0.52 / 0.46</td>
+<td>0.46 / 0.46</td>
+</tr>
+<tr>
+<td>exp(0.2x + 0.2x²)</td>
+<td>0.51 / 0.49</td>
+<td>0.49 / 0.45</td>
+<td>0.45 / 0.45</td>
+</tr>
+<tr>
+<td>step</td>
+<td>0.80 / 0.74</td>
+<td>0.78 / 0.74</td>
+<td>0.74 / 0.73</td>
+</tr>
+</tbody>
+</table></div>
+<p>At T = 400 every ratio matches the paper; at T = 100–200 the pyfgls ratios are 0.03–0.06
+higher. The tuning-free benchmarks agree with the paper at T = 100 (WLS-S1: x 0.92 vs
+0.91, x² 0.71 vs 0.68, (log x)² 0.52 vs 0.54; infeasible GLS within 0.02), and so do the
+interval lengths of Table 2 (Lasso: x² 1.12 vs 1.10, (log x)² 0.32 vs 0.32, exp 1.35 vs
+1.34), so the small-sample difference comes from the tuning of the adaptive Lasso (an
+open item). The 95% intervals from eqs. (6)+(8) cover 0.94–0.96 throughout.</p>
+<h3 id="pg26-supplement-s-4-serial-correlation-and-heteroskedasticity-t-200"><a href="#pg26-supplement-s-4-serial-correlation-and-heteroskedasticity-t-200">[PG26] Supplement S-4: serial correlation and heteroskedasticity (T = 200)</a></h3>
+<p>Slope MSE × 100 and coverage of 95% intervals, 1,000 replications, candidate covariates
+<span class="math">\(W = (w, w^2, \cos w, \cos 2w)\)</span>.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>errors, v(·), driver</th>
+<th>F-C</th>
+<th>F-CH</th>
+<th>Lasso only</th>
+<th>OLS</th>
+<th>coverage F-C / F-CH</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AR(1) 0.5, x², w = x</td>
+<td>3.99</td>
+<td>2.84</td>
+<td>6.13</td>
+<td>6.67</td>
+<td>0.962 / 0.956</td>
+</tr>
+<tr>
+<td>AR(1) 0.5, (log x)², w = x</td>
+<td>0.47</td>
+<td>0.22</td>
+<td>0.65</td>
+<td>0.79</td>
+<td>0.960 / 0.960</td>
+</tr>
+<tr>
+<td>AR(1) 0.5, exp, w = x</td>
+<td>8.44</td>
+<td>3.82</td>
+<td>9.75</td>
+<td>13.65</td>
+<td>0.962 / 0.956</td>
+</tr>
+<tr>
+<td>AR(2) (1.34, −0.42), x²</td>
+<td>1.65</td>
+<td>1.08</td>
+<td>51.3</td>
+<td>50.1</td>
+<td>0.958 / 0.953</td>
+</tr>
+<tr>
+<td>MA(1) 0.5, x²</td>
+<td>3.95</td>
+<td>2.92</td>
+<td>5.41</td>
+<td>6.21</td>
+<td>0.958 / 0.947</td>
+</tr>
+<tr>
+<td>ARMA(1,1) (0.8, −0.4), x²</td>
+<td>4.29</td>
+<td>3.24</td>
+<td>6.52</td>
+<td>7.15</td>
+<td>0.958 / 0.956</td>
+</tr>
+<tr>
+<td>AR(1) 0.5, x², mixture driver</td>
+<td>3.90</td>
+<td>2.40</td>
+<td>5.17</td>
+<td>6.19</td>
+<td>0.957 / 0.956</td>
+</tr>
+<tr>
+<td>AR(1) 0.5, homoskedastic</td>
+<td>0.534</td>
+<td>0.542</td>
+<td>0.941</td>
+<td>0.923</td>
+<td>0.954 / 0.951</td>
+</tr>
+</tbody>
+</table></div>
+<p>Non-exogenous regressor (<span class="math">\(x_t + \gamma e_{t-1}\)</span>): coverage of the F-CH interval with and
+without the first-stage correction is 0.942 / 0.777 (AR(1) 0.5, γ = 0.5) and 0.923 / 0.860
+(AR(1) 0.8, γ = 1). The correction is therefore on by default for pre-determined
+regressors.</p>
+</section>
+<section class="doc-section" aria-labelledby="faq">
+<h2 id="faq" class="doc-h2"><a href="#faq">FAQ and troubleshooting</a></h2>
+<p><strong>Why not Cochrane–Orcutt?</strong>
+It estimates the AR filter from OLS residuals. When the regressors are only
+pre-determined, OLS is inconsistent, and so is the filter: in the [PG26] Table 1 design
+the Cochrane–Orcutt estimate of <span class="math">\(\rho = 0.8\)</span> is biased by about −0.17 and the slope by
++0.03, while FGLS based on the Durbin regression is essentially unbiased.
+<code>pyfgls.benchmarks.cochrane_orcutt</code> is available for comparison.</p>
+<p><strong>Why a robust variance for FGLS?</strong>
+Estimating the filter adds variability that the textbook GLS variance ignores whenever
+the regressors are correlated with past errors ([PG26] eq. (29)). For the heteroskedastic
+estimator, the fitted variance function is only an approximation, so a sandwich with a
+bias correction is used ([GP24] eq. (8)).</p>
+<p><strong>Isn't OLS with HAC standard errors safer?</strong>
+Only if the regressors are exogenous — otherwise OLS is inconsistent. Even then, GLS can
+be far more precise and HAC intervals tend to under-cover with persistent errors.</p>
+<p><strong>What if there is no serial correlation or heteroskedasticity?</strong>
+BIC selects <span class="math">\(k^* = 0\)</span> and/or the Lasso selects no covariate; you get OLS with valid
+standard errors.</p>
+<p><strong>Can I use panel data?</strong>
+Not yet: a <code>MultiIndex</code> raises a <code>TimeIndexError</code>.</p>
+<p><strong>Which warnings and errors can I get, and what do I do about them?</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Warning or error</th>
+<th>What it means</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TimeIndexError</code></td>
+<td>The index is unsorted, has duplicates, has gaps (dates or periods), or is a panel <code>MultiIndex</code>.</td>
+<td>Sort it and remove duplicates. For trading-day data pass <code>allow_gaps=True</code> (lags are then positional). Panels are not supported.</td>
+</tr>
+<tr>
+<td><code>MissingDataError</code></td>
+<td>Missing or infinite values.</td>
+<td><code>missing=&quot;drop&quot;</code> drops incomplete rows (for time series only leading and trailing ones, since interior gaps would corrupt the lags). Infinite values always raise.</td>
+</tr>
+<tr>
+<td><code>CollinearityError</code></td>
+<td><code>X</code> is rank deficient; the message names the columns.</td>
+<td>Drop or combine them (for example a constant plus a full set of dummies).</td>
+</tr>
+<tr>
+<td><code>InsufficientDataError</code></td>
+<td>Too few observations for the model.</td>
+<td>Use a longer sample or a smaller model: fewer regressors, a lower <code>kmax</code> or <code>ar_order</code>, fewer <code>cv_folds</code>.</td>
+</tr>
+<tr>
+<td><code>InputError</code></td>
+<td>Other invalid input: shapes, non-numeric data, unknown options.</td>
+<td>The message names the argument.</td>
+</tr>
+<tr>
+<td><code>NonStationaryWarning</code></td>
+<td>A root of the estimated AR filter is on or near the unit circle.</td>
+<td>The errors may have a unit root: screen with <code>check_stationarity=True</code>, difference the data or respecify the model.</td>
+</tr>
+<tr>
+<td><code>CollinearityWarning</code></td>
+<td>Columns were dropped where that is safe (lagged constants and trends in the Durbin regression).</td>
+<td>Usually nothing; the summary notes list them.</td>
+</tr>
+<tr>
+<td><code>LaggedDependentWarning</code></td>
+<td>A regressor equals a lag of <code>y</code>.</td>
+<td>Declare it: <code>lagged_dep_vars=[&quot;ylag&quot;]</code>.</td>
+</tr>
+<tr>
+<td><code>SpecificationWarning</code></td>
+<td>An unusual specification, such as no intercept.</td>
+<td>Add a column of ones, unless the omission is intended.</td>
+</tr>
+<tr>
+<td><code>SampleSizeWarning</code></td>
+<td>The sample is small relative to the parameters, lags or folds.</td>
+<td>Expect noisier lag or covariate selection; a smaller <code>kmax</code>, <code>z</code> or <code>cv_folds</code> helps.</td>
+</tr>
+<tr>
+<td><code>WeightWarning</code></td>
+<td>The FGLS weights are extreme (a very large max/min variance ratio).</td>
+<td>Look for outliers; <code>weight_clip=(0.01, 0.99)</code> winsorises the fitted log-variance.</td>
+</tr>
+<tr>
+<td><code>ConvergenceWarning</code></td>
+<td>An iterative routine did not converge: the Lasso path, the MA(1) likelihood of GMA, or iterated Cochrane–Orcutt.</td>
+<td>Check the scaling of the data and the specification before relying on the fit.</td>
+</tr>
+<tr>
+<td><code>ExperimentalWarning</code></td>
+<td>The feature is experimental, such as <code>test_predetermined</code>.</td>
+<td>Results and the API may change.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>How do I silence the warnings?</strong>
+All warnings derive from <code>pyfgls.exceptions.PyFGLSWarning</code>:
+<code>warnings.simplefilter(&quot;ignore&quot;, pf.exceptions.PyFGLSWarning)</code>.</p>
+</section>
+<section class="doc-section" aria-labelledby="citation">
+<h2 id="citation" class="doc-h2"><a href="#citation">Citation</a></h2>
+<p>If you use <code>pyfgls</code>, please cite the papers that the methods come from:</p>
+<ul>
+<li>Perron, P. and González-Coya, E. (2026). Feasible GLS for time series regression.
+<em>Journal of Econometrics</em> 258, 106346. https://doi.org/10.1016/j.jeconom.2026.106346</li>
+<li>González-Coya, E. and Perron, P. (2024). Estimation in the presence of
+heteroskedasticity of unknown form: a Lasso-based approach. <em>Journal of Econometric
+Methods</em> 13(1), 29–48. https://doi.org/10.1515/jem-2023-0007</li>
+</ul>
+<div class="code" data-lang="bibtex"><div class="code-head"><span class="code-lang">bibtex</span></div><pre><code><span class="nc">@article</span><span class="p">{</span><span class="nl">PerronGonzalezCoya2026</span><span class="p">,</span>
+<span class="w">  </span><span class="na">author</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="s">{Perron, Pierre and Gonz{\'a}lez-Coya, Emilio}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">title</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{Feasible {GLS} for time series regression}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">journal</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{Journal of Econometrics}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">volume</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="s">{258}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">pages</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{106346}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">year</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="s">{2026}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">doi</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="s">{10.1016/j.jeconom.2026.106346}</span>
+<span class="p">}</span>
+
+<span class="nc">@article</span><span class="p">{</span><span class="nl">GonzalezCoyaPerron2024</span><span class="p">,</span>
+<span class="w">  </span><span class="na">author</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="s">{Gonz{\'a}lez-Coya, Emilio and Perron, Pierre}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">title</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{Estimation in the presence of heteroskedasticity of unknown form:</span>
+<span class="s">             a {L}asso-based approach}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">journal</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{Journal of Econometric Methods}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">volume</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="s">{13}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">number</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="s">{1}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">pages</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{29--48}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">year</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="s">{2024}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">doi</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="s">{10.1515/jem-2023-0007}</span>
+<span class="p">}</span></code></pre></div>
+<p>See also <a href="https://github.com/emiliogcs/pyfgls/blob/main/CITATION.cff"><code>CITATION.cff</code></a> to cite the software itself. License: MIT ©
+Emilio González-Coya. Questions and bug reports:
+<a href="https://github.com/emiliogcs/pyfgls/issues">GitHub Issues</a>. Changes between versions:
+<a href="https://github.com/emiliogcs/pyfgls/blob/main/CHANGELOG.md"><code>CHANGELOG.md</code></a>.</p>
+</section>
+      </div>
+    </div>
+    <!-- pyfgls:end -->
+    <p class="vh" id="status" aria-live="polite"></p>
+  </main>
+
+  <footer class="wrap grid section site-footer" aria-labelledby="contact-h">
+    <h2 class="label" id="contact-h">Contact</h2>
+    <div class="body footer-row">
+      <ul class="links">
+        <li><a href="/contact/">email</a></li>
+        <li><a href="https://scholar.google.com/citations?user=ekQ7IjcAAAAJ">google scholar</a></li>
+        <li><a href="https://github.com/emiliogcs">github</a></li>
+        <li><a href="https://www.linkedin.com/in/emiliogcs/">linkedin</a></li>
+      </ul>
+      <div class="theme-switch" role="group" aria-labelledby="theme-label" hidden>
+        <span class="theme-label" id="theme-label">theme</span>
+        <button type="button" value="auto" aria-pressed="true">auto</button>
+        <button type="button" value="light" aria-pressed="false">light</button>
+        <button type="button" value="dark" aria-pressed="false">dark</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Math: MathJax 3.2.2, served from this site (assets/vendor) and loaded by
+       site.js once an equation comes near the screen (data-mathjax on <body>). -->
+  <script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},options:{ignoreHtmlClass:"doc",processHtmlClass:"math"},chtml:{matchFontHeight:false},startup:{pageReady:function(){return MathJax.startup.defaultPageReady().then(function(){document.dispatchEvent(new Event("typeset"))})}}};</script>
+</body>
+</html>
