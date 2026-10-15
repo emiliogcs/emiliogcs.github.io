@@ -318,6 +318,20 @@ a:hover {
     padding-top: 112px;
   }
 }
+/* With the birds (body.sky), the flock sits above the statement until 1200px. */
+.sky .intro {
+  padding-top: 32px;
+}
+@media (min-width: 900px) {
+  .sky .intro {
+    padding-top: 48px;
+  }
+}
+@media (min-width: 1200px) {
+  .sky .intro {
+    padding-top: 112px;
+  }
+}
 
 .statement {
   font-size: clamp(28px, 4vw, 40px);
@@ -362,6 +376,65 @@ a:hover {
 .phi {
   font-family: var(--serif);
   font-size: 13px;
+}
+
+/* ---------------------------------------------------------------- birds */
+/* Birds: two birds traced from a line drawing (scripts/birds.py) sit in
+   the intro as drawn. With motion allowed, site.js
+   hides them there (.aloft keeps their space) and flies them, with three
+   more, in .flight: one layer over the window, above the text. */
+
+.intro {
+  position: relative;
+}
+.flock {
+  display: block;
+  position: relative;
+  width: auto;
+  height: 200px;
+  margin: 0 0 32px auto;
+  overflow: visible;
+  color: var(--ink);
+  pointer-events: none;
+}
+.flock.aloft {
+  visibility: hidden;
+}
+@media (min-width: 900px) {
+  .flock {
+    grid-column: 3 / -1;
+    justify-self: end;
+    height: 240px;
+    margin: 0 0 40px;
+  }
+}
+@media (min-width: 1200px) {
+  .flock {
+    position: absolute;
+    top: 8px;
+    right: 0;
+    height: min(340px, 24vw);
+    margin: 0;
+  }
+}
+
+.flight {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 1;
+  color: var(--ink);
+}
+.flight.armed path {
+  stroke-dasharray: var(--len) var(--len);
+  stroke-dashoffset: var(--len);
+}
+.flight.armed.draw path {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1.6s cubic-bezier(0.3, 0.5, 0.3, 1) var(--delay, 0s);
 }
 
 /* ------------------------------------------------------------- research */
@@ -576,7 +649,8 @@ details[open] > summary .sign::before {
    them. If the script never runs, they appear after 2.5s regardless. */
 @media (prefers-reduced-motion: no-preference) {
   .js .plate-fig:not(.ready) svg,
-  .js .line:not(.ready) svg {
+  .js .line:not(.ready) svg,
+  .js .flock:not(.ready) {
     opacity: 0;
     animation: failsafe 0s 2.5s forwards;
   }
@@ -763,7 +837,9 @@ details[open] > summary .sign::before {
   .skip,
   .actions,
   .bib,
-  .theme-switch {
+  .theme-switch,
+  .flock,
+  .flight {
     display: none !important;
   }
   .wrap {

@@ -4,18 +4,25 @@ Personal site of Emilio González Coya. Plain HTML, one stylesheet, one
 small script, served by GitHub Pages from `main` / root. Nothing to build: what
 is in the repository is what is deployed.
 
+The home page carries birds traced from a line drawing that fly over the page
+as it scrolls (see "Birds"). The earlier version, with a generative figure for
+each paper and an AR(1) line under the intro, is kept on the `classic` branch:
+`git checkout classic` to see it, or merge it back into `main` to restore it.
+
 ```
-index.html                  the whole site
+index.html                  the whole site, with the birds
 404.html                    served by GitHub Pages for any missing path
 assets/site.css             all styles (tokens at the top)
-assets/site.js              a fresh AR(1) line per visit, figure drawing, BibTeX copy, theme switch
+assets/site.js              birds in flight, BibTeX copy, theme switch (and, for the classic version, the AR(1) line and figures)
 assets/fonts/               EB Garamond 400 + italic, IBM Plex Mono 400 (woff2, Latin + Latin Extended-A; licences alongside)
 assets/og.png               1200×630 social preview
-favicon.svg
+favicon.svg                 the middle bird, simplified
 robots.txt, sitemap.xml        for search engines (bump <lastmod> in sitemap.xml after big changes)
 cv/index.html               redirect → /              (old WordPress URL; see "Add the CV")
 working-papers/index.html   redirect → /#research     (old WordPress URL)
-scripts/plates.mjs          generates the paper figures and inlines them
+scripts/plates.mjs          generates the paper figures (classic version) and the one in og.png
+scripts/birds.py            traces the two birds on the home page (one-off; see below)
+birds/index.html            redirect → /              (the birds page became the home page)
 scripts/og.html             template for og.png
 CNAME                       emiliogcs.com
 ```
@@ -60,6 +67,9 @@ Each one is an `<article class="plate">`.
    - Put the BibTeX entry inside `<details class="bib"><summary>bibtex</summary><pre>…</pre></details>`.
      Take author name forms, volume, issue, pages and year from the
      publisher's record (Crossref: `curl -LH "Accept: application/x-bibtex" https://doi.org/<DOI>`).
+Steps 2–4 apply to the classic version only: the current home page shows
+no paper figures. Skip to step 5.
+
 2. **Design its figure.** Every paper gets its own drawing, computed from the
    econometrics in the paper. In `scripts/plates.mjs`, add a function next to
    `fgls()`, `uip()` and `lasso()` and register it in `PLATES`. The rules:
@@ -97,6 +107,28 @@ When a forthcoming paper comes out, change the venue to
 `<cite>Journal</cite> volume (year), pages.`, drop `note = {Forthcoming}`
 from its BibTeX (adding volume, number, pages), and update `creativeWorkStatus`
 / `datePublished` in the JSON-LD.
+
+## Birds
+
+The only graphics on the home page are birds from a line drawing
+(`RossMcCampbell65.png`, kept out of the repository): the upper and the
+middle bird, traced once with `python3 scripts/birds.py path/to/drawing.png`
+(numpy + Pillow), which writes them between the `<!-- birds -->` markers in
+`index.html`.
+
+At the top of the page they sit as drawn; both are diving, the upper one
+down-left and the middle one down-right. Once you scroll, they take off
+into a layer over the whole window, joined by three copies of the middle
+bird (mirrored and tilted for other headings), and fly over the page, text
+included. Each flies forward along its heading whichever way you scroll,
+drifting only a few degrees, and a bird that leaves the window comes back
+in from the edge it was flying away from. The flock is the `BIRDS` list in
+`assets/site.js`: heading (degrees, 0 right, 90 down), mirror, depth (size,
+speed and lightness), grow (drawing nearer or farther while crossing), when
+it first enters, and its wing-beat pace. Wings beat in real time: steadily
+while the page moves, flap-flap-glide at rest (`data-flap` in the page:
+where the wings meet the body, half-span, lift, side). Without JavaScript
+or with reduced motion, the drawing stays still in the intro.
 
 ## Social image
 
