@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://emiliogcs.com/sitemap.xml

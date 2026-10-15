@@ -12,6 +12,7 @@ assets/site.js              a fresh AR(1) line per visit, figure drawing, BibTeX
 assets/fonts/               EB Garamond 400 + italic, IBM Plex Mono 400 (woff2, Latin + Latin Extended-A; licences alongside)
 assets/og.png               1200×630 social preview
 favicon.svg
+robots.txt, sitemap.xml        for search engines (bump <lastmod> in sitemap.xml after big changes)
 cv/index.html               redirect → /              (old WordPress URL; see "Add the CV")
 working-papers/index.html   redirect → /#research     (old WordPress URL)
 scripts/plates.mjs          generates the paper figures and inlines them
