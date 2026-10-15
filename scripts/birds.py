@@ -41,12 +41,12 @@ PARTS = [
     ("drop", "wing", LOWER_WINGS + LOWER_BODY),
 ]
 # Wing beat: where the wings meet the body (x, y in image pixels), how far
-# the tips lift (fraction of the half-span), and which side beats (0 both,
-# 1 right only). Below the body (head, feet, tail) nothing moves.
+# each wing sweeps up and down from the drawn pose (degrees), and which side
+# beats (0 both, 1 right only). Head, feet and tail stay still.
 # HEADING: the way each bird is flying as drawn, in degrees on screen
 # (0 right, 90 down): both are diving, the upper bird down and to the left,
 # the middle one down and to the right. site.js flies them that way.
-FLAP = {"upper": (565, 365, 0.12, 0), "middle": (370, 730, 0.13, 0)}
+FLAP = {"upper": (565, 365, 28, 0), "middle": (370, 730, 30, 0)}
 HEADING = {"upper": 140, "middle": 62}
 
 
@@ -196,10 +196,10 @@ def main(src):
     ]
     for bird, roles in birds.items():
         a, _ = boxes[bird]
-        cx, cy, lift, side = FLAP[bird]
+        cx, cy, sweep, side = FLAP[bird]  # sweep: degrees up and down
         wx = np.concatenate([q[:, 0] for q in roles["wing"]])
         span = max(cx - wx.min(), wx.max() - cx)
-        flap = f"{r1(cx - a[0])} {r1(cy - a[1])} {r1(span)} {lift} {side}"
+        flap = f"{r1(cx - a[0])} {r1(cy - a[1])} {r1(span)} {sweep} {side}"
         paths = "".join(
             f'<path class="{role}" d="{d_of(roles[role], a)}" vector-effect="non-scaling-stroke"/>'
             for role in ("still", "wing") if roles.get(role)

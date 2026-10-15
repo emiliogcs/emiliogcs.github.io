@@ -127,7 +127,7 @@ in from the edge it was flying away from. The flock is the `BIRDS` list in
 speed and lightness), grow (drawing nearer or farther while crossing), when
 it first enters, and its wing-beat pace. Wings beat in real time: steadily
 while the page moves, flap-flap-glide at rest (`data-flap` in the page:
-where the wings meet the body, half-span, lift, side). Without JavaScript
+where the wings meet the body, half-span, sweep in degrees, side). Without JavaScript
 or with reduced motion, the drawing stays still in the intro.
 
 ## Social image

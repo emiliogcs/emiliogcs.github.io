@@ -236,10 +236,11 @@ if (switcher) {
 // away from. Depth sets size, speed and lightness: near birds are larger,
 // darker and faster; some draw nearer or farther as they cross.
 // Wings beat in real time at each bird's own pace: steadily while the page
-// moves, flap-flap-glide when it rests. A beat bends the drawing about the
-// body (data-flap: where the wings meet the body, x and y; half-span; lift;
-// side): the tips move most and trail the base; head, feet and tail hold
-// still; the body rises a touch on the downstroke.
+// moves, flap-flap-glide when it rests. A beat turns each wing about its
+// shoulder (data-flap: where the wings meet the body, x and y; half-span;
+// sweep, degrees up and down from the drawn pose; side), the inner wing less
+// than the outer and the tip trailing a little, so the wing flexes through a
+// smooth, full stroke; head, feet and tail hold still.
 
 const flock = document.querySelector('.flock');
 if (flock && !still) {
@@ -256,11 +257,11 @@ if (flock && !still) {
   // wait: px of flight before it first enters the window; beat: wing beats a
   // second, and the length of its flap-glide cycle at rest.
   const BIRDS = [
-    { bird: 'upper', heading: 140, depth: 0.95, grow: -0.15, beat: [1.8, 5.2] },
-    { bird: 'middle', heading: 62, depth: 1, grow: 0.3, beat: [1.9, 4.6] },
-    { bird: 'middle', heading: 124, mirror: true, depth: 0.55, grow: 0, wait: 260, beat: [2.1, 6.1] },
-    { bird: 'middle', heading: 34, depth: 0.75, grow: -0.25, wait: 700, beat: [1.8, 5.6] },
-    { bird: 'middle', heading: 150, mirror: true, depth: 1.15, grow: 0.15, wait: 1300, beat: [2.0, 4.9] },
+    { bird: 'upper', heading: 140, depth: 0.95, grow: -0.15, beat: [1.45, 5.2] },
+    { bird: 'middle', heading: 62, depth: 1, grow: 0.3, beat: [1.5, 4.6] },
+    { bird: 'middle', heading: 124, mirror: true, depth: 0.55, grow: 0, wait: 260, beat: [1.65, 6.1] },
+    { bird: 'middle', heading: 34, depth: 0.75, grow: -0.25, wait: 700, beat: [1.55, 5.6] },
+    { bird: 'middle', heading: 150, mirror: true, depth: 1.15, grow: 0.15, wait: 1300, beat: [1.4, 4.9] },
   ];
 
   const parse = (d) =>
@@ -273,15 +274,24 @@ if (flock && !still) {
   const outline = (strokes) =>
     strokes.map((pts) => 'M' + pts.map(([x, y], j) => (j === 1 ? 'L' : '') + x.toFixed(1) + ' ' + y.toFixed(1)).join(' ')).join(' ');
   // theta: where the bird is in its beat; amp: how fully it is beating (0 = glide)
-  const bend = (pts, [cx, cy, span, lift, side], theta, amp) =>
-    pts.map(([x, y]) => {
-      const dx = side ? Math.max(0, x - cx) : Math.abs(x - cx);
-      const reach = Math.min(1, dx / span); // 0 at the body, 1 at the tip
+  const bend = (pts, [cx, cy, span, sweep, side], theta, amp) => {
+    const gap = 0.06 * span; // the shoulders sit just either side of the body
+    return pts.map(([x, y]) => {
+      const dx = x - cx;
+      if (side && dx < 0) return [x, y];
+      const reach = Math.min(1, Math.max(0, Math.abs(dx) - gap) / (span - gap)); // 0 at the shoulder, 1 at the tip
+      if (!reach) return [x, y];
       const below = Math.max(0, 1 - Math.max(0, y - cy) / (0.25 * span)); // head, feet, tail: still
-      const w = reach ** 1.6 * below;
-      const beat = Math.sin(theta - 0.9 * reach) * amp; // the tip trails the base
-      return [cx + (x - cx) * (1 - 0.05 * Math.abs(beat) * w), y - lift * span * beat * w];
+      const w = reach ** 0.7 * (below + (1 - below) * reach); // the whole wing turns, the body does not
+      const a = -Math.sign(dx) * sweep * RAD * amp * w * Math.sin(theta - 0.8 * reach); // the tip trails the base
+      const px = cx + Math.sign(dx) * gap;
+      const vx = x - px;
+      const vy = y - cy;
+      const c = Math.cos(a);
+      const s = Math.sin(a);
+      return [px + vx * c - vy * s, cy + vx * s + vy * c];
     });
+  };
 
   // The birds as drawn: shapes, wing-beat settings, heading, and place.
   const tpl = {};
@@ -392,13 +402,12 @@ if (flock && !still) {
       b.amp += (Math.max(activity, 0.75 * rest) - b.amp) * 0.08;
       b.theta += TAU * rate * dt * (0.55 + 0.45 * b.amp);
       const s = size(b);
-      const rise = drawn ? b.amp * Math.cos(b.theta) * 0.012 * b.t.h * s : 0; // body rises on the downstroke
 
       // turn the drawing to face its course
       const turn = course - b.drawn;
       b.g.setAttribute(
         'transform',
-        `translate(${b.x.toFixed(1)} ${(b.y - rise).toFixed(1)}) rotate(${turn.toFixed(2)}) scale(${(s * (b.mirror ? -1 : 1)).toFixed(4)} ${s.toFixed(4)}) translate(${(-b.t.cx).toFixed(1)} ${(-b.t.cy).toFixed(1)})`,
+        `translate(${b.x.toFixed(1)} ${b.y.toFixed(1)}) rotate(${turn.toFixed(2)}) scale(${(s * (b.mirror ? -1 : 1)).toFixed(4)} ${s.toFixed(4)}) translate(${(-b.t.cx).toFixed(1)} ${(-b.t.cy).toFixed(1)})`,
       );
       const depth = s / u;
       b.g.style.opacity = depth < 1 ? (0.35 + 0.65 * depth).toFixed(3) : '';
