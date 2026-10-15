@@ -18,7 +18,7 @@ code/intervals.png          its figure (copied there by the same script)
 assets/site.css             all styles (tokens at the top)
 assets/site.js              birds in flight, BibTeX copy, theme switch, the code page's copy buttons and contents (and, for the classic version, the AR(1) line and figures)
 assets/vendor/mathjax-3.2.2/  MathJax (tex-chtml.js and its fonts, Apache-2.0 licence alongside), loaded only by /code/
-assets/fonts/               EB Garamond 400 + italic, IBM Plex Mono 400 (woff2, Latin + Latin Extended-A; licences alongside)
+assets/fonts/               EB Garamond 400 + italic, IBM Plex Mono 400 (woff2, Latin + Latin Extended-A, Greek, math symbols; licences alongside)
 assets/og.png               1200×630 social preview
 favicon.svg                 the middle bird, simplified
 robots.txt, sitemap.xml        for search engines (bump <lastmod> in sitemap.xml after big changes)
@@ -174,18 +174,30 @@ contents sit in a closed `<details>` above the documentation.
 
 ## Fonts
 
-Subset from the Google Fonts sources with fontTools, keeping kerning,
-ligatures, old-style and lining figures, and true small caps:
+Subset from the Google Fonts sources (in [google/fonts](https://github.com/google/fonts):
+`ofl/ebgaramond/EBGaramond[wght].ttf` and `EBGaramond-Italic[wght].ttf`,
+`ofl/ibmplexmono/IBMPlexMono-Regular.ttf`) with fontTools, keeping kerning,
+ligatures, old-style and lining figures, and true small caps. EB Garamond is
+instanced at weight 400 from the variable font first:
 
 ```sh
+fonttools varLib.instancer "EBGaramond[wght].ttf" wght=400 -o EBGaramond-400.ttf
 pyftsubset EBGaramond-400.ttf --flavor=woff2 --no-hinting \
   --layout-features="kern,liga,onum,lnum,pnum,tnum,smcp,c2sc,case,locl,ccmp,mark,mkmk" \
-  --unicodes="U+0000-00FF,U+0100-017F,U+0131,U+0152-0153,U+0192,U+0218-021B,U+0237,U+02BB-02BC,U+02C6-02C7,U+02D8-02DD,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2190-2199,U+2212,U+2215,U+FEFF,U+FFFD"
+  --unicodes="U+0000-00FF,U+0100-017F,U+0131,U+0152-0153,U+0192,U+0218-021B,U+0237,U+02BB-02BC,U+02C6-02C7,U+02D8-02DD,U+0302-0304,U+0307-0308,U+0329,U+0370-03FF,U+2000-206F,U+2070-209F,U+20AC,U+2122,U+2150-215E,U+2190-2199,U+2200-22FF,U+FEFF,U+FFFD" \
+  --output-file=eb-garamond-400.woff2
 ```
 
-(The italic also keeps U+03C6, φ, for the caption under the line. EB Garamond
-was instanced at weight 400 from the variable font first with
-`fonttools varLib.instancer`.)
+The italic and `IBMPlexMono-Regular.ttf` take the same `pyftsubset` line.
+Beyond Latin and Latin Extended-A, the list covers what the pyfgls
+documentation on `/code/` writes in running text: Greek (U+0370–03FF), the
+combining hat, tilde and dot (ρ̂), super- and subscripts, fractions and the
+Mathematical Operators block (≤ ≥ ≈ ≠ √ ∞ ∑ …). Code points a font lacks are
+skipped: Plex Mono has no Greek but π, and neither font has ∈ or ⌊ ⌋ ⌈ ⌉, so
+those fall back to system fonts. EB Garamond has no accent anchors on Greek
+letters, so the hat in ρ̂ sits a little right of centre. TeX inside `.math`
+is set by MathJax in its own fonts. To see what a file covers:
+`fonttools ttx -t cmap -o - assets/fonts/eb-garamond-400.woff2`.
 
 ## Checks before pushing
 
