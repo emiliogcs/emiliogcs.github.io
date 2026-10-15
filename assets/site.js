@@ -273,6 +273,10 @@ if (flock && !still) {
     });
   const outline = (strokes) =>
     strokes.map((pts) => 'M' + pts.map(([x, y], j) => (j === 1 ? 'L' : '') + x.toFixed(1) + ' ' + y.toFixed(1)).join(' ')).join(' ');
+  const smoothstep = (e0, e1, v) => {
+    const t = Math.max(0, Math.min(1, (v - e0) / (e1 - e0)));
+    return t * t * (3 - 2 * t);
+  };
   // theta: where the bird is in its beat; amp: how fully it is beating (0 = glide)
   const bend = (pts, [cx, cy, span, sweep, side], theta, amp) => {
     const gap = 0.06 * span; // the shoulders sit just either side of the body
@@ -281,8 +285,10 @@ if (flock && !still) {
       if (side && dx < 0) return [x, y];
       const reach = Math.min(1, Math.max(0, Math.abs(dx) - gap) / (span - gap)); // 0 at the shoulder, 1 at the tip
       if (!reach) return [x, y];
-      const below = Math.max(0, 1 - Math.max(0, y - cy) / (0.25 * span)); // head, feet, tail: still
-      const w = reach ** 0.7 * (below + (1 - below) * reach); // the whole wing turns, the body does not
+      // head, feet and tail (well below the shoulders, close to the body) hold
+      // still; the rest of the wing, its lower feathers included, turns whole
+      const body = smoothstep(0, 0.2 * span, y - cy) * (1 - smoothstep(0.4, 0.65, reach));
+      const w = reach ** 0.7 * (1 - body);
       const a = -Math.sign(dx) * sweep * RAD * amp * w * Math.sin(theta - 0.8 * reach); // the tip trails the base
       const px = cx + Math.sign(dx) * gap;
       const vx = x - px;
