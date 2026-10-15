@@ -10,7 +10,8 @@ each paper and an AR(1) line under the intro, is kept on the `classic` branch:
 `git checkout classic` to see it, or merge it back into `main` to restore it.
 
 ```
-index.html                  the whole site, with the birds
+index.html                  the home page, with the birds
+contact/index.html          contact page: email, links, and the birds circling the address
 404.html                    served by GitHub Pages for any missing path
 assets/site.css             all styles (tokens at the top)
 assets/site.js              birds in flight, BibTeX copy, theme switch (and, for the classic version, the AR(1) line and figures)
@@ -21,7 +22,7 @@ robots.txt, sitemap.xml        for search engines (bump <lastmod> in sitemap.xml
 cv/index.html               redirect → /              (old WordPress URL; see "Add the CV")
 working-papers/index.html   redirect → /#research     (old WordPress URL)
 scripts/plates.mjs          generates the paper figures (classic version) and the one in og.png
-scripts/birds.py            traces the two birds on the home page (one-off; see below)
+scripts/birds.py            traces the two birds for the home and contact pages (one-off; see below)
 birds/index.html            redirect → /              (the birds page became the home page)
 scripts/og.html             template for og.png
 CNAME                       emiliogcs.com
@@ -129,6 +130,13 @@ it first enters, and its wing-beat pace. Wings beat in real time: steadily
 while the page moves, flap-flap-glide at rest (`data-flap` in the page:
 where the wings meet the body, half-span, sweep in degrees, side). Without JavaScript
 or with reduced motion, the drawing stays still in the intro.
+
+On the contact page (`<body data-birds="orbit">`) the same birds wheel round
+the email address instead: a ring seen a little from above, so birds at the
+back are smaller, lighter and pass behind the address, and at the front
+larger, darker and in front. The `ORBIT` list in `assets/site.js` sets each
+bird's ring, height, speed, size and starting point; hovering the address
+quickens them and the copy button sends them round in a swirl.
 
 ## Social image
 

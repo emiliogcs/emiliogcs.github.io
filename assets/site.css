@@ -428,6 +428,68 @@ a:hover {
   z-index: 1;
   color: var(--ink);
 }
+/* Contact page: the birds wheel round the address. Birds at the back of
+   their ring fly in .flight.behind, under the text; at the front, in
+   .flight.ahead, over it. With motion allowed the drawing itself is not
+   shown there (site.js sizes the birds as it would be). */
+[data-birds="orbit"] .site-header,
+[data-birds="orbit"] main,
+[data-birds="orbit"] .site-footer {
+  position: relative;
+  z-index: 1;
+}
+.flight.behind {
+  z-index: 0;
+}
+.flight.ahead {
+  z-index: 2;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-birds="orbit"] .flock {
+    display: none;
+  }
+}
+.contact {
+  min-height: 62vh;
+}
+.sky .intro.contact {
+  padding-top: clamp(96px, 24vh, 240px); /* the address about a third of the way down, room for the ring */
+}
+.contact-email {
+  font-size: clamp(28px, 4vw, 40px); /* the home page statement's size */
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.contact-email a {
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+  transition: color 0.2s, text-decoration-color 0.2s;
+}
+.contact-email a:hover,
+.contact-email a:focus-visible {
+  text-decoration-color: currentColor;
+}
+.contact-copy {
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 24px;
+}
+.contact-copy .act {
+  float: none;
+  display: inline-block;
+}
+.contact .links {
+  margin-top: 28px;
+}
+.contact-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 48px;
+}
+
 .flight.armed path {
   stroke-dasharray: var(--len) var(--len);
   stroke-dashoffset: var(--len);
