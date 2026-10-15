@@ -1,0 +1,735 @@
+/* emiliogcs.com — one stylesheet, no build step. */
+
+/* ---------------------------------------------------------------- fonts */
+
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/assets/fonts/eb-garamond-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/assets/fonts/eb-garamond-400-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/assets/fonts/ibm-plex-mono-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Metric-matched fallbacks (computed from the real fonts), so the swap
+   from system font to web font moves nothing. */
+@font-face {
+  font-family: "Garamond Fallback";
+  src: local("Times New Roman"), local("TimesNewRomanPSMT"), local("Liberation Serif"), local("Tinos");
+  size-adjust: 94.17%;
+  ascent-override: 106.94%;
+  descent-override: 31.65%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Plex Fallback";
+  src: local("Menlo"), local("Menlo-Regular"), local("Courier New"), local("CourierNewPSMT"), local("Liberation Mono"), local("Cousine");
+  size-adjust: 99.8%;
+  ascent-override: 102.7%;
+  descent-override: 27.55%;
+  line-gap-override: 0%;
+}
+
+/* --------------------------------------------------------------- tokens */
+
+:root {
+  --paper: #F5F3EE;
+  --ink: #151515;
+  --muted: #6B6A66;
+  --rule: #D9D6CF;
+  --accent: #8C2F23; /* oxblood */
+
+  --serif: "EB Garamond", "Garamond Fallback", Garamond, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", "Plex Fallback", ui-monospace, Menlo, Consolas, monospace;
+
+  --gutter: 20px;
+  --gap: 24px;
+  --max: 1280px;
+  --space: 80px; /* between sections */
+
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0F0F0E;
+    --ink: #ECE9E2;
+    --muted: #8E8B84;
+    --rule: #2A2926;
+    --accent: #D27A68;
+  }
+}
+@media (min-width: 900px) {
+  :root {
+    --gutter: 48px;
+    --space: 128px;
+  }
+}
+
+/* ----------------------------------------------------------------- base */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 18px/1.6 var(--serif);
+  font-variant-numeric: oldstyle-nums;
+  font-kerning: normal;
+  overflow-wrap: break-word;
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+figure,
+pre {
+  margin: 0;
+}
+ul {
+  padding: 0;
+  list-style: none;
+}
+h1,
+h2,
+h3 {
+  font-weight: 400;
+}
+cite {
+  font-style: italic;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+a:hover {
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* Visually hidden, still read aloud. */
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 4px 8px;
+  background: var(--paper);
+  font: 13px/1.6 var(--mono);
+  transform: translateY(-200%);
+}
+.skip:focus {
+  transform: none;
+}
+
+/* Small caps for acronyms in running text. */
+.sc {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.04em;
+}
+
+/* Mono metadata: labels, years, numbers, link rows. */
+.mono,
+.label,
+.note,
+.actions,
+.nav,
+.links,
+.yr,
+.sublabel,
+.line-cap {
+  font-family: var(--mono);
+  font-variant-numeric: lining-nums;
+}
+
+/* --------------------------------------------------------------- layout */
+
+.wrap {
+  width: min(100% - 2 * var(--gutter), var(--max));
+  margin-inline: auto;
+}
+
+/* Twelve columns on desktop: labels sit in 1–2, text starts at column 3. */
+@media (min-width: 900px) {
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gap);
+    align-items: start;
+  }
+  .grid > .label {
+    grid-column: 1 / 3;
+  }
+  .grid > .body {
+    grid-column: 3 / -1;
+  }
+}
+
+.reading {
+  max-width: 640px;
+}
+
+.section {
+  margin-top: var(--space);
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+}
+
+.label {
+  font-size: 12px;
+  line-height: 24px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 32px;
+}
+@media (min-width: 900px) {
+  .label {
+    margin-bottom: 0;
+  }
+}
+
+/* --------------------------------------------------------------- header */
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  column-gap: 32px;
+  row-gap: 4px;
+  padding-top: 28px;
+}
+@media (min-width: 900px) {
+  .site-header {
+    padding-top: 40px;
+  }
+}
+
+.name {
+  font-size: 17px;
+  line-height: 24px;
+  font-variant-caps: all-small-caps;
+  font-variant-numeric: lining-nums;
+  letter-spacing: 0.06em;
+}
+
+.nav ul,
+.links {
+  display: flex;
+  flex-wrap: wrap;
+}
+.nav {
+  font-size: 13px;
+  line-height: 24px;
+  text-transform: lowercase;
+}
+.nav a,
+.links a {
+  display: inline-block;
+  min-height: 24px;
+}
+/* The dot hangs off the end of each item, so a wrapped row never starts with one. */
+.nav li:not(:last-child)::after,
+.links li:not(:last-child)::after {
+  content: "·";
+  content: "·" / "";
+  margin-inline: 0.6em;
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- intro */
+
+.intro {
+  padding-top: 72px;
+}
+@media (min-width: 900px) {
+  .intro {
+    padding-top: 112px;
+  }
+}
+
+.statement {
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.2;
+  max-width: 17em;
+  text-wrap: balance;
+}
+
+.bio {
+  margin-top: 32px;
+  max-width: 34em; /* ≈ 64ch */
+  text-wrap: pretty;
+}
+
+/* ------------------------------------------------------------- the line */
+
+.line {
+  margin-top: 64px;
+}
+@media (min-width: 900px) {
+  .line {
+    margin-top: 96px;
+  }
+}
+.line-svg {
+  display: block;
+  width: 100%;
+  height: 64px;
+  color: var(--muted);
+  overflow: visible;
+}
+.line-svg path {
+  stroke-width: 0.75;
+}
+.line-cap {
+  margin-top: 8px;
+  font-size: 11px;
+  line-height: 16px;
+  text-align: right;
+  color: var(--muted);
+}
+.phi {
+  font-family: var(--serif);
+  font-size: 13px;
+}
+
+/* ------------------------------------------------------------- research */
+
+.plate {
+  display: grid;
+  gap: 24px;
+}
+/* Plates: a hairline with 96px between them, split either side. */
+.plate + .plate {
+  margin-top: 48px;
+  padding-top: 48px;
+  border-top: 1px solid var(--rule);
+}
+.plate-fig {
+  order: -1; /* figure above the text on narrow screens */
+  max-width: 560px;
+}
+@media (min-width: 900px) {
+  .plate {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: 48px;
+    align-items: start;
+  }
+  .plate-fig {
+    order: 0;
+    max-width: 400px;
+    width: 100%;
+  }
+}
+
+.plate-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  transition: color 0.2s;
+}
+.plate-svg .base {
+  stroke: var(--rule);
+}
+
+.plate-title {
+  font-size: clamp(24px, 2.6vw, 32px);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.plate-title a {
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition: color 0.2s, text-decoration-color 0.2s;
+}
+
+.with {
+  margin-top: 12px;
+  font-style: italic;
+  color: var(--muted);
+}
+.venue {
+  margin-top: 2px;
+}
+.note {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--muted);
+  text-transform: lowercase;
+}
+
+/* Hover or focus anywhere in a plate: figure to accent, title underlined. */
+.plate:hover .plate-svg,
+.plate:focus-within .plate-svg {
+  color: var(--accent);
+}
+.plate:hover .plate-title a,
+.plate:focus-within .plate-title a {
+  text-decoration-color: currentColor;
+}
+
+/* Action row: paper ↗ · supplement ↗ · bibtex · abstract +
+   Links float so the abstract's <summary> can share their line while its
+   content opens full width below. */
+.actions {
+  margin-top: 16px;
+  font-size: 13px;
+  line-height: 24px;
+  text-transform: lowercase;
+}
+.actions::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.act,
+.sep {
+  float: left;
+}
+.sep {
+  margin-inline: 0.6em;
+  color: var(--muted);
+}
+.act {
+  display: block;
+  min-height: 24px;
+  white-space: nowrap;
+}
+button.act {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+button.act:hover {
+  color: var(--accent);
+}
+
+details > summary {
+  list-style: none;
+  cursor: pointer;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+.abstract > summary {
+  display: inline-block;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+.abstract > summary:hover {
+  color: var(--accent);
+}
+.sign::before {
+  content: "+";
+}
+details[open] > summary .sign::before {
+  content: "−";
+}
+
+.abstract-body {
+  clear: left;
+  max-width: 60ch;
+  padding-top: 12px;
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.55;
+  font-variant-numeric: oldstyle-nums;
+  text-transform: none;
+  text-wrap: pretty;
+}
+.abstract-body p + p {
+  margin-top: 0.6em;
+}
+.abstract-body .run-in {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.04em;
+}
+
+/* Animate the abstract opening where the platform can; open instantly elsewhere. */
+@supports (interpolate-size: allow-keywords) {
+  @media (prefers-reduced-motion: no-preference) {
+    :root {
+      interpolate-size: allow-keywords;
+    }
+    .abstract::details-content {
+      block-size: 0;
+      overflow: clip;
+      transition: block-size 0.35s cubic-bezier(0.3, 0, 0.2, 1), content-visibility 0.35s allow-discrete;
+    }
+    .abstract[open]::details-content {
+      block-size: auto;
+    }
+  }
+}
+
+/* BibTeX without JavaScript: a plain <details>. With JavaScript it becomes
+   a copy button, and this only reappears if the clipboard is unavailable. */
+.bib {
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 24px;
+}
+.bib > summary {
+  display: inline-block;
+}
+.bib > summary::after {
+  content: " +";
+}
+.bib[open] > summary::after {
+  content: " −";
+}
+.bib pre {
+  margin-top: 8px;
+  padding: 12px 0;
+  border-block: 1px solid var(--rule);
+  font: 12px/1.6 var(--mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  tab-size: 2;
+}
+
+/* --------------------------------------------------- figures in motion */
+
+/* With JS and motion allowed, figures wait (invisible) until site.js arms
+   them. If the script never runs, they appear after 2.5s regardless. */
+@media (prefers-reduced-motion: no-preference) {
+  .js .plate-fig:not(.ready) svg,
+  .js .line:not(.ready) svg {
+    opacity: 0;
+    animation: failsafe 0s 2.5s forwards;
+  }
+}
+@keyframes failsafe {
+  to {
+    opacity: 1;
+  }
+}
+
+.armed .plate-svg path:not(.base):not(.null) {
+  stroke-dasharray: var(--len) var(--len);
+  stroke-dashoffset: var(--len);
+}
+.armed .plate-svg circle,
+.armed .plate-svg .null {
+  opacity: 0;
+}
+.armed.draw .plate-svg path:not(.base):not(.null) {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset var(--dur, 1.3s) cubic-bezier(0.25, 0.6, 0.3, 1) var(--delay, 0s);
+}
+.armed.draw .plate-svg circle,
+.armed.draw .plate-svg .null {
+  opacity: 1;
+  transition: opacity 0.4s ease-out var(--delay, 0s);
+}
+
+.line.armed .line-svg {
+  clip-path: inset(0 100% 0 0);
+}
+.line.armed.draw .line-svg {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1.8s cubic-bezier(0.45, 0.05, 0.25, 1);
+}
+
+/* ----------------------------------------------------------- also, bg */
+
+.plain li + li {
+  margin-top: 12px;
+}
+
+.lists {
+  display: grid;
+  gap: 48px;
+}
+.sublabel {
+  font-size: 13px;
+  line-height: 24px;
+  color: var(--muted);
+  text-transform: lowercase;
+  margin-bottom: 12px;
+}
+.cv li {
+  display: grid;
+  grid-template-columns: 7.5em minmax(0, 1fr);
+  column-gap: 16px;
+}
+.cv li + li {
+  margin-top: 10px;
+}
+.yr {
+  font-size: 13px;
+  line-height: 1.6rem;
+  padding-top: 2px; /* settle the mono years on the serif baseline */
+  color: var(--muted);
+  white-space: nowrap;
+}
+.org {
+  color: var(--muted);
+}
+@media (max-width: 479px) {
+  .cv li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .yr {
+    padding-top: 0;
+    line-height: 20px;
+  }
+}
+
+/* --------------------------------------------------------------- footer */
+
+.site-footer {
+  margin-bottom: 96px;
+}
+.links {
+  font-size: 13px;
+  line-height: 24px;
+}
+.links .place {
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- 404 */
+
+.lost {
+  padding-top: 112px;
+  padding-bottom: 160px;
+}
+.lost p + p {
+  margin-top: 16px;
+}
+
+/* ------------------------------------------------------------ motion */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+  }
+}
+
+/* ------------------------------------------------------------- print */
+
+@media print {
+  :root {
+    --paper: #fff;
+    --ink: #000;
+    --muted: #444;
+    --rule: #bbb;
+    --accent: #000;
+    --space: 32px;
+  }
+  body {
+    font-size: 11pt;
+  }
+  .nav,
+  .line,
+  .skip,
+  .actions,
+  .bib {
+    display: none !important;
+  }
+  .wrap {
+    width: auto;
+    margin-inline: 0;
+  }
+  .intro {
+    padding-top: 24px;
+  }
+  .plate,
+  .cv li {
+    break-inside: avoid;
+  }
+  .plate-fig {
+    max-width: 240px;
+  }
+  .plate-svg {
+    color: #000 !important;
+  }
+  a[href^="http"]::after,
+  a[href^="mailto:"]::after {
+    content: " (" attr(href) ")";
+    font-family: var(--mono);
+    font-size: 8pt;
+    color: var(--muted);
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+  a[href^="/"]:not([href="/"]):not([href^="/#"])::after {
+    content: " (https://emiliogcs.com" attr(href) ")";
+    font-family: var(--mono);
+    font-size: 8pt;
+    color: var(--muted);
+  }
+  .plate-title a::after {
+    display: block;
+    margin-top: 2px;
+  }
+}
