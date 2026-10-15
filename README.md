@@ -132,8 +132,9 @@ or with reduced motion, the drawing stays still in the intro.
 
 ## Social image
 
-`assets/og.png` is rendered from `scripts/og.html` (it carries plate 01). After
-re-running the plates, regenerate it with any headless Chrome:
+`assets/og.png` is rendered from `scripts/og.html`, which carries the two
+birds as drawn (`scripts/birds.py` writes them there too). After changing
+the template or the birds, regenerate it with any headless Chrome:
 
 ```sh
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \

@@ -9,7 +9,8 @@ every stroke is assigned to a bird by its nearest anchor points. Only the
 upper and the middle bird are kept (the small shape at the top and the
 bottom bird are dropped). Each bird is a <g> with one path, inside one
 <svg class="flock">, written between <!-- birds --> and <!-- /birds --> in
-index.html. site.js flies them, and copies of the middle one.
+index.html (site.js flies them, and copies of the middle one) and in
+scripts/og.html, the template for the social image.
 
 The source PNG is not part of the site. Run this once and commit the page.
 """
@@ -21,7 +22,7 @@ import numpy as np
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
-TARGETS = ["index.html"]
+TARGETS = ["index.html", "scripts/og.html"]
 
 TOP = [(246, 12), (284, 86), (349, 83), (389, 46), (482, 80), (116, 47), (203, 92), (311, 133), (396, 145), (439, 96)]
 UPPER_WINGS = [(923, 124), (809, 137), (710, 161), (621, 195), (580, 258), (559, 362), (926, 167), (866, 207), (920, 207), (614, 337), (688, 263), (791, 218), (511, 353), (461, 274), (370, 257), (283, 270), (107, 338), (61, 368), (150, 341), (409, 356), (301, 385), (223, 427), (200, 396), (99, 414), (130, 361)]
