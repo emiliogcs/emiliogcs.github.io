@@ -276,12 +276,15 @@ a:hover {
   }
 }
 
+/* The name is set as the section labels are (mono capitals, tracked), in
+   full ink as the link home. */
 .name {
-  font-size: 17px;
+  font-family: var(--mono);
+  font-size: 12px;
   line-height: 24px;
-  font-variant-caps: all-small-caps;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   font-variant-numeric: lining-nums;
-  letter-spacing: 0.06em;
 }
 
 .nav ul,
@@ -486,8 +489,14 @@ a:hover {
 }
 .contact-footer {
   display: flex;
-  justify-content: flex-end;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px 32px;
   margin-top: 48px;
+}
+.contact-footer .colophon {
+  margin-top: 0;
 }
 
 .flight.armed path {
@@ -805,6 +814,20 @@ details[open] > summary .sign::before {
 }
 .links .place {
   color: var(--muted);
+}
+/* The full name, small, under the footer: the one place it is spelled out. */
+.colophon {
+  margin-top: 24px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 24px;
+  font-variant-numeric: lining-nums;
+  color: var(--muted);
+}
+@media (min-width: 900px) {
+  .grid > .colophon {
+    grid-column: 3 / -1;
+  }
 }
 .footer-row {
   display: flex;
