@@ -167,7 +167,14 @@ scripts/sync_site.sh "path/to/this/checkout"
 ```
 
 The rest of `code/index.html` (head, meta tags, menu, footer) is ordinary site
-HTML. Math is typeset by MathJax 3.2.2 from `assets/vendor/`, loaded by
+HTML, and so is the row above the intro, `python · r (cran)` (`<nav class="langs">`),
+whose `r` links to `/fgls/`: the documentation of the R package
+[fgls](https://github.com/emiliogcs/fgls), the same estimators in R. That site is
+built by pkgdown in the fgls repository and served from its `gh-pages` branch, not
+from here; it wears this site's design (header, footer, fonts, colours, the code
+page's layout) through `_pkgdown.yml` and `pkgdown/extra.css` there, and loads
+the fonts and the favicon from this site (`/assets/fonts/`, `/favicon.svg`): keep
+those paths, and copy changes to the tokens, header or footer across. Math is typeset by MathJax 3.2.2 from `assets/vendor/`, loaded by
 `site.js` only when an equation comes near the screen; without JavaScript the
 TeX shows as text. The contents column is sticky from 1200px; narrower, the
 contents sit in a closed `<details>` above the documentation.

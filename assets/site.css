@@ -887,6 +887,25 @@ details[open] > summary .sign::before {
    metadata in mono, code between hairlines as the BibTeX entries are.
    Contents: a sticky column from 1200px, a closed <details> above that. */
 
+/* Above the intro: python (this page) · r (the fgls package, /fgls/), the
+   page in use underlined, as the theme in use in the footer. */
+.langs {
+  padding-top: 72px;
+}
+@media (min-width: 900px) {
+  .langs {
+    padding-top: 112px;
+  }
+}
+.langs + .intro {
+  padding-top: 20px;
+}
+.langs a[aria-current] {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
 .code-intro .statement {
   max-width: 15em;
 }
@@ -1326,6 +1345,7 @@ mjx-container[display="true"] {
     font-size: 11pt;
   }
   .nav,
+  .langs,
   .line,
   .skip,
   .actions,
