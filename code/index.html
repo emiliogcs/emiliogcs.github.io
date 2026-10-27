@@ -105,7 +105,7 @@ statsmodels-style results, pandas support and the papers' simulation designs.</p
           <span class="sep" aria-hidden="true">·</span>
           <a class="act" href="#citation">bibtex</a>
         </div>
-        <p class="note">version 0.1.0 · python ≥ 3.10 · MIT license</p>
+        <p class="note">version 0.1.2 · python ≥ 3.10 · MIT license</p>
       </div>
     </section>
 
@@ -1215,7 +1215,7 @@ k_T = int(4(T/100)^{2/9}) lags (§5), and all T observations are transformed.</l
 </section>
 <section class="doc-section" aria-labelledby="api">
 <h2 id="api" class="doc-h2"><a href="#api">API reference</a></h2>
-<p class="api-note">Generated from the docstrings of pyfgls 0.1.0.</p>
+<p class="api-note">Generated from the docstrings of pyfgls 0.1.2.</p>
 <h3 id="api-estimators"><a href="#api-estimators">Estimators</a></h3>
 <div class="api-obj api-class">
 <h4 id="pyfgls-FGLS" class="api-h"><a href="#pyfgls-FGLS"><code>pyfgls.FGLS</code></a> <span class="api-kind">class</span></h4>
@@ -1250,6 +1250,8 @@ k_T = int(4(T/100)^{2/9}) lags (§5), and all T observations are transformed.</l
     missing='raise',
     allow_gaps=False,
     check_stationarity=False,
+    foldid=None,
+    lambda_grid=None,
 )</code></pre></div>
 <p>Feasible GLS for serial correlation and/or heteroskedasticity.</p>
 <p><code>FGLS(y, X)</code> corrects for both problems: the AR filter of [PG26] (Durbin
@@ -1298,6 +1300,14 @@ correction.</p>
 <dt><code>random_state</code> <span class="api-type">int or Generator</span></dt>
 <dd><p>Seeds the cross-validation folds (and, unless overridden in <code>fit</code>, the
 bootstrap).</p>
+</dd>
+<dt><code>foldid</code> <span class="api-type">array_like of int</span></dt>
+<dd><p>Explicit fold labels for the skedastic cross-validation (one per observation
+entering the skedastic fit: <code>T</code> for <code>serial=None</code>, <code>T - k*</code> otherwise);
+overrides <code>cv_folds</code>/<code>fold_scheme</code>/<code>random_state</code>.</p>
+</dd>
+<dt><code>lambda_grid</code> <span class="api-type">sequence of float</span></dt>
+<dd><p>Explicit Lasso penalty grid used for every <code>psi</code>.</p>
 </dd>
 <dt><code>n_jobs</code> <span class="api-type">int</span></dt>
 <dd><p>Parallel jobs (cross-validation, bootstrap).</p>
@@ -1495,6 +1505,8 @@ filter — for errors known to be MA(1), e.g. two-step-ahead forecast errors.</p
     random_state=None,
     n_jobs=None,
     missing='raise',
+    foldid=None,
+    lambda_grid=None,
 )</code></pre></div>
 <p>Feasible GLS under heteroskedasticity of unknown form ([GP24]).</p>
 <p>The log of the squared OLS residuals is regressed on candidate covariates <code>z</code>
@@ -1579,6 +1591,7 @@ callable of <code>X</code>) uses the given variances (infeasible GLS benchmark).
     stages=dict(),
     options=dict(),
     notes=(),
+    estimate=None,
 )</code></pre></div>
 <p>Results of an FGLS (or OLS benchmark) fit.</p>
 <p>Most users access the statsmodels-like attributes <code>params</code>, <code>bse</code>,
@@ -1623,6 +1636,10 @@ sample — the estimated innovations.</p>
 </dd>
 <dt><code>options</code> <span class="api-type">dict</span></dt>
 <dd><p>Options used for the fit.</p>
+</dd>
+<dt><code>estimate</code> <span class="api-type">(object, optional)</span></dt>
+<dd><p>The estimator's internal results (<code>SerialEstimate</code>, <code>HeteroEstimate</code>,
+<code>CombinedEstimate</code> or <code>GMAEstimate</code>); see <code>pyfgls.testing.export_fit()</code>.</p>
 </dd>
 </dl>
 <div class="api-obj api-property">
