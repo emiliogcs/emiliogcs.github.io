@@ -169,7 +169,8 @@ scripts/sync_site.sh "path/to/this/checkout"
 The rest of `code/index.html` (head, meta tags, menu, footer) is ordinary site
 HTML, and so is the row above the intro, `python · r (cran)` (`<nav class="langs">`),
 whose `r` links to `/fgls/`: the documentation of the R package
-[fgls](https://github.com/emiliogcs/fgls), the same estimators in R. That site is
+[fgls](https://github.com/emiliogcs/fgls), the same estimators in R (`cran` links to
+its page on CRAN, <https://CRAN.R-project.org/package=fgls>). That site is
 built by pkgdown in the fgls repository and served from its `gh-pages` branch, not
 from here; it wears this site's design (header, footer, fonts, colours, the code
 page's layout) through `_pkgdown.yml` and `pkgdown/extra.css` there, and loads
